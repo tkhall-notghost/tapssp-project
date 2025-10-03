@@ -1,7 +1,7 @@
 # overtopr
 Overtopr will be a system monitor written in Rust by **Tessa Hall**.
 
-Final project for for my Theory and Practice of Safe Systems Programming CSC-463 class.
+[Final project](https://fpl.cs.depaul.edu/cpitcher/courses/csc363/worksheets/project.html) (DePaul University internal link) for for my Theory and Practice of Safe Systems Programming CSC-463 class.
 
 
 # Summary overview
