@@ -44,10 +44,10 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
 
 # Potentially relevant Rust crates
 
-- (systemstat crate)[https://codeberg.org/valpackett/systemstat]
+- [systemstat crate](https://codeberg.org/valpackett/systemstat)
   - I might not use this one, in favor of stat'ing this system information directly. It also seems like the most niche and unmaintained crate here.
-- (Systemd crate)[https://docs.rs/systemd/latest/systemd/]
-- (Linux ip crate)[https://docs.rs/linux_ip/latest/linux_ip/#modules]
+- [Systemd crate](https://docs.rs/systemd/latest/systemd/)
+- [Linux ip crate](https://docs.rs/linux_ip/latest/linux_ip/#modules)
 
 # An Aside on permissions
 
