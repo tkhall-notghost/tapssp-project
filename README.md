@@ -18,7 +18,7 @@ I am including as much as I can think of under this feature roadmap in order of 
 Key:
 - [] unimplemented
 - [x] implemented
-- [x] [x] implemented & pretty
+- [x] :white_check_mark: implemented & pretty
 
 - [x] List memory utilization (RAM)
   - [x] Used
