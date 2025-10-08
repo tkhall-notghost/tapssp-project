@@ -16,7 +16,7 @@ I will be developing this on my Arch Linux machine targeting a typical Systemd e
 I am including as much as I can think of under this feature roadmap in order of which features should be implemented first. This is not to be taken as my realistic expectations for what I may actually be able to finish before the project is due, but just an outline of what more could be done.
 
 Key:
-- [] unimplemented
+- [ ] unimplemented
 - [x] implemented
 - [x] :white_check_mark: implemented & pretty
 
@@ -26,26 +26,26 @@ Key:
   - [x] Free
   - [x] Swap usage
 - List CPU utilization
-  - Totals
+  - [ ] Totals
 	- [x] Temperature
 	- [x] Average CPU core utilization %
-	- Number of cores available
-	- CPU Model
-	- CPU Frequency
-  - CPU utilization % per-core
-- list system services (systemd units by default)
+	- [ ] Number of cores available
+	- [ ] CPU Model
+	- [ ] CPU Frequency
+  - [ ] CPU utilization % per-core
+- [ ] list current network namespaces and hardware network interfaces
+  - [ ] up/down status
+  - [ ] IP address (inet) (if applicable)
+  - [ ] MAC address (link) (if applicable)
+  - [x] Network interface statistics
+- [ ] (stretch-goal) list system services (systemd units by default)
   - Active
 	- Running (resource utilization summary)
 	- Exited (and why it exited)
   - Inactive
   - Enabled/Disabled state
   - Root or User service? (if supported by init system)
-- list current network namespaces and hardware network interfaces
-  - up/down status
-  - IP address (inet) (if applicable)
-  - MAC address (link) (if applicable)
-  - [x] Network interface statistics
-- TUI with Ncurses or something similar if time permits
+- [ ] (stretch goal) TUI with Ncurses or something similar if time permits
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor.
 
