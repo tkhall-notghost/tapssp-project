@@ -5,8 +5,11 @@ MIT License 2025
 
  */
 
+mod system_base;
+
 extern crate systemstat;
 
+use crate::system_base::SystemBase;
 use std::thread;
 use std::time::Duration;
 use systemstat::{System, Platform, saturating_sub_bytes};
@@ -14,8 +17,15 @@ use systemstat::{System, Platform, saturating_sub_bytes};
 fn main() {
     println!("overtopr:");
 		let sys = System::new(); // System from systemstat crate
-		
+		// create a generic SystemBase which represents our gathered System information
+		let mut base = SystemBase::new();
+		// run a refresh, update all SystemBase values to reflect current system stats
+		SystemBase::refresh(&mut base);
+
+
 		/*
+		Everything below will ultimately be moved into system_base's refresh() function.
+		
 		The following example code blocks represent only a few metrics of many more I want to gather
 		and needs to be phased out for output that is much more legible
 		 */
