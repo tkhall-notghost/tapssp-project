@@ -15,20 +15,25 @@ I will be developing this on my Arch Linux machine targeting a typical Systemd e
 # Feature roadmap
 I am including as much as I can think of under this feature roadmap in order of which features should be implemented first. This is not to be taken as my realistic expectations for what I may actually be able to finish before the project is due, but just an outline of what more could be done.
 
-- List memory utilization (RAM)
-  - Used
-  - Available
-  - Free
-  - Swap usage
+Key:
+- [] unimplemented
+- [x] implemented
+- [x] [x] implemented & pretty
+
+- [x] List memory utilization (RAM)
+  - [x] Used
+  - [x] Available
+  - [x] Free
+  - [x] Swap usage
 - List CPU utilization
   - Totals
-	- Temperature
-	- Average CPU core utilization %
+	- [x] Temperature
+	- [x] Average CPU core utilization %
 	- Number of cores available
 	- CPU Model
 	- CPU Frequency
   - CPU utilization % per-core
-- list system services (systemd services by default)
+- list system services (systemd units by default)
   - Active
 	- Running (resource utilization summary)
 	- Exited (and why it exited)
@@ -39,7 +44,7 @@ I am including as much as I can think of under this feature roadmap in order of 
   - up/down status
   - IP address (inet) (if applicable)
   - MAC address (link) (if applicable)
-  - Current bandwidth usage
+  - [x] Network interface statistics
 - TUI with Ncurses or something similar if time permits
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor.
@@ -47,9 +52,9 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
 # Potentially relevant Rust crates
 
 - [systemstat crate](https://codeberg.org/valpackett/systemstat)
-  - I might not use this one, in favor of stat'ing this system information directly. It also seems like the most niche and unmaintained crate here.
-- [Systemd crate](https://docs.rs/systemd/latest/systemd/)
-- [Linux ip crate](https://docs.rs/linux_ip/latest/linux_ip/#modules)
+  - I will be making heavy use of this crate for wider platform comptability
+- A crate for linux network namespace information?
+- A crate for interfacing with systemd units?
 
 # An Aside on permissions
 
