@@ -20,15 +20,15 @@ Key:
 - [x] implemented
 - [x] :white_check_mark: implemented & pretty
 
-- [x] List memory utilization (RAM)
-  - [x] Used
-  - [x] Available
-  - [x] Free
-  - [x] Swap usage
+- [ ] List memory utilization (RAM)
+  - [ ] Used
+  - [ ] Available
+  - [ ] Free
+  - [ ] Swap usage
 - List CPU utilization
   - [ ] Totals
-	- [x] Temperature
-	- [x] Average CPU core utilization %
+	- [ ] Temperature
+	- [ ] Average CPU core utilization %
 	- [ ] Number of cores available
 	- [ ] CPU Model
 	- [ ] CPU Frequency
@@ -37,7 +37,7 @@ Key:
   - [ ] up/down status
   - [ ] IP address (inet) (if applicable)
   - [ ] MAC address (link) (if applicable)
-  - [x] Network interface statistics
+  - [ ] Network interface statistics
 - [ ] (stretch-goal) list system services (systemd units by default)
   - Active
 	- Running (resource utilization summary)
@@ -51,10 +51,16 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
 
 # Potentially relevant Rust crates
 
+- [sysinfo crate](https://doc.cuprate.org/sysinfo/index.html)
+  - supports linux/bsd/windows/$LATESTNAMEFORAPPLEOS
+  - basic system utilization info
+  - limited interfaces info
+- [zbus_systemd crate](https://docs.rs/zbus_systemd/latest/zbus_systemd/)
+  - interface with all elements of systemd, but...
+  - I'm interested in [list_units](https://docs.rs/zbus_systemd/latest/zbus_systemd/systemd1/struct.ManagerProxy.html#method.list_units) which meets the corresponding [ListUnits() from the freedesktop spec](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.systemd1.html#ListUnits()).
+  - Also has more detailed network interface information for Linux systems supporting systemd
 - [systemstat crate](https://codeberg.org/valpackett/systemstat)
-  - I will be making heavy use of this crate for wider platform comptability
-- A crate for linux network namespace information?
-- A crate for interfacing with systemd units?
+  - Fallback system stats crate. Looks less maintained.
 
 # An Aside on permissions
 
