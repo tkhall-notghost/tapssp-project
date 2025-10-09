@@ -3,8 +3,13 @@ Overtopr will be a system monitor written in Rust by **Tessa Hall**.
 
 [Final project](https://fpl.cs.depaul.edu/cpitcher/courses/csc363/worksheets/project.html) (DePaul University internal link) for for my Theory and Practice of Safe Systems Programming CSC-463 class.
 
+## compilation/usage
 
-# Summary overview
+- `cd overtop` (from root of this repository)
+- `cargo build`
+- `cargo run` to test. Ctrl-C to quit for now.
+
+## Summary overview
 
 I will try to implement as many of the below features as possible. However unlike "top" or similair system process monitors I want a CLI/TUI system overview from a more abstract level, without individual processes. Instead the most granular element of the system to inspect in the monitor will be the status of various system services, catering towards systemd units, but written with traits for extensibility for services of different init systems. The rest of the system monitor output will be typical (if more visually concise) system resource utilization you would expect from a normal system resource monitor.
 
@@ -12,7 +17,7 @@ Since I don't intend on setting up a TUI unless time permits, the initial comman
 
 I will be developing this on my Arch Linux machine targeting a typical Systemd environment. I hope that compatibilty will be broader than my distrobution, but I might not be able to make guarantees. In any case, anything which fails should fail safely.
 
-# Feature roadmap
+## Feature roadmap
 I am including as much as I can think of under this feature roadmap in order of which features should be implemented first. This is not to be taken as my realistic expectations for what I may actually be able to finish before the project is due, but just an outline of what more could be done.
 
 Key:
@@ -62,7 +67,3 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - Also has more detailed network interface information for Linux systems supporting systemd
 - [systemstat crate](https://codeberg.org/valpackett/systemstat)
   - Fallback system stats crate. Looks less maintained.
-
-# An Aside on permissions
-
-This program will inevitably need root read and execute permissions to work correctly on a Linux machine. I will be using established crates for interfacing with system resources when possible, and in cases where it is not I will open files as read-only to prevent any possible system breakage from logic errors. So no matter what this should be safe to execute regardless of the required permissions. I understand if that claim might not persuade whoever has to grade this though and I can package the end product with a demo in a linux container if requested. Email me at thall42@depaul.edu or message me on Discord (Tessa Hall) if necessary.
