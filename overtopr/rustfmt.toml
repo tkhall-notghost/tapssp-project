@@ -1,0 +1,13 @@
+tab_spaces = 2
+hard_tabs = true
+reorder_imports = true
+newline_style = "Unix"
+spaces_within_angle_brackets = false
+spaces_within_parens = false
+spaces_within_square_brackets = false
+fn_return_indent = "WithArgs"
+fn_brace_style = "SameLineWhere"
+item_brace_style = "PreferSameLine"
+where_layout = "Horizontal"
+where_style = "Rfc"
+control_style = "Rfc"
