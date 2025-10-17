@@ -19,7 +19,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	println!("Memory Used: {}", base.get_mem_used());
 	println!("Memory Free: {}", base.get_mem_free());
 	println!("Swap Used: {}", base.get_cpu_avg());
-	println!("Network Interface Stats ------------")	
+	println!("Network Interface Stats ------------");
 	for iface in base.get_network_interfaces() {
 			println!("interface: {} - MAC: {}", iface.name, iface.mac);
 			println!("  tx bytes: {} - rx bytes: {}",iface.tx_bytes,iface.rx_bytes);
