@@ -55,11 +55,6 @@ impl SystemBase {
 		self.sys_networks.refresh(true);
 		let mut net_ifaces = Vec::new();
 			for (interface_name, net_data) in &self.sys_networks {
-
-					let tx_bytes = net_data.transmitted();
-					let rx_bytes = net_data.received();
-					let mac_addr = net_data.mac_address();
-					// this is ALLEGEDLY a struct with an addr field and a prefix field. however I can't access them?
 					let nets = net_data.ip_networks();
 					let mut ret_networks = Vec::new();
 					for n in nets {
@@ -74,18 +69,7 @@ impl SystemBase {
 					};
 					net_ifaces.push(iface_info);
 		}
-		// TODO: use procfs crate to fetch detailed networking info
 			self.net_interfaces = net_ifaces;
-			/*
-		an attempt with procfs, but it seems you can't directly map a destination IP in use to each interface.
-		let iface_proc_result = procfs::net::	InterfaceDeviceStatus::current().unwrap_or(panic!("failed to stat the /proc/net interface status file(s)"));
-		let iface_statuses = iface_proc_result.0;
-		for (iface,dev_status) in iface_statuses {
-				// iface is name of interface
-				// dev_status is the DeviceStatus struct https://docs.rs/procfs/latest/procfs/net/struct.DeviceStatus.html
-	  }
-			 */
-		
 		self
 	}
 	// example getter:
