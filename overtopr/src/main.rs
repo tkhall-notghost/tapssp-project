@@ -19,7 +19,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	println!("Memory Used: {}", base.get_mem_used());
 	println!("Memory Free: {}", base.get_mem_free());
 	println!("Swap Used: {}", base.get_cpu_avg());
-	println!("Network Interfaces: {}", base.get_network_interfaces());
+	// println!("Network Interfaces: {}", base.get_network_interfaces());
 }
 
 fn main() {
