@@ -38,12 +38,11 @@ Key:
 	- [ ] CPU Model
 	- [ ] CPU Frequency
   - [ ] CPU utilization % per-core
-- [ ] list current network namespaces and hardware network interfaces
+- [x] list current network interfaces
   - [x] list network interfaces
-  - [ ] up/down status
-  - [ ] IP address (inet) (if applicable)
-  - [ ] MAC address (link) (if applicable)
-  - [ ] Network interface statistics
+  - [x] IP address (inet) (if applicable)
+  - [x] MAC address (link) (if applicable)
+  - [x] Network interface statistics
 - [ ] (stretch-goal) list system services (systemd units by default)
   - Active
 	- Running (resource utilization summary)
