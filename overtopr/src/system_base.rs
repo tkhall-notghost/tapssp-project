@@ -87,13 +87,8 @@ impl SystemBase {
 																		match maybe_linkobject {
 																				Ok(lo) => {
 																						// lo is a: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.network1.html#Link%20Object
-																						let res_addrinfo = executor::block_on(lo.address_state());
-																						match res_addrinfo {
-																								Ok(addrinfo) => {
-																										// addrinfo is a string! the address? maybe?
-																								},
-																								Err(_) => (),
-																						}
+																						// addrinfo may be blank if it can't be found
+																						let addrinfo = executor::block_on(lo.address_state()).unwrap_or(String::from(""));
 																				},
 																				Err(_) => (),
 																		}
