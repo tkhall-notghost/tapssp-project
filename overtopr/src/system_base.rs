@@ -74,28 +74,25 @@ impl SystemBase {
 												// In this case dbus was able to get a connection and create a manager proxy
 												// so here is where the work of actually getting network info can begin
 												let maybe_links = manager.list_links();
-												let links = executor::block_on(maybe_links);
-												match links {
-														Ok(linkvec) => {
-																for link in linkvec {
-																		// presumably these contain useful info...
-																		// gotta read some docs to find out what exactly...
-																		let link_index = link.0; // index of interface?
-																		let link_name = link.1; // interface name string?
-																		let link_oopath = link.2; // dbus internal identifier object?
-																		let maybe_linkobject = executor::block_on(LinkProxy::new(&connection,link_oopath));
-																		match maybe_linkobject {
-																				Ok(lo) => {
-																						// lo is a: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.network1.html#Link%20Object
-																						// addrinfo may be blank if it can't be found
-																						let addrinfo = executor::block_on(lo.address_state()).unwrap_or(String::from(""));
-																				},
-																				Err(_) => (),
-																		}
-																}
-														},
-														Err(_) => (),
+												// linkvec is empty if there is an error
+												let linkvec = executor::block_on(maybe_links).unwrap_or(Vec::new());
+												for link in linkvec {
+														// presumably these contain useful info...
+														// gotta read some docs to find out what exactly...
+														let link_index = link.0; // index of interface?
+														let link_name = link.1; // interface name string?
+														let link_oopath = link.2; // dbus internal identifier object?
+														let maybe_linkobject = executor::block_on(LinkProxy::new(&connection,link_oopath));
+														match maybe_linkobject {
+																Ok(lo) => {
+																		// lo is a: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.network1.html#Link%20Object
+																		// addrinfo may be blank if it can't be found
+																		let addrinfo = executor::block_on(lo.address_state()).unwrap_or(String::from(""));
+																},
+																Err(_) => (),
+														}
 												}
+												// end of "linkvec"
 										},
 										Err(_) => (),
 								}
