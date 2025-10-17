@@ -4,11 +4,11 @@ use core::net::IpAddr;
 
 #[derive(Clone)]
 pub struct NetIfaceInfo {
-		name: String,
-		tx_bytes: u64,
-		rx_bytes: u64,
-		mac: MacAddr,
-		networks: Vec<IpAddr>,
+		pub name: String,
+		pub tx_bytes: u64,
+		pub rx_bytes: u64,
+		pub mac: MacAddr,
+		pub networks: Vec<IpAddr>,
 }
 
 pub struct SystemBase {
@@ -20,6 +20,7 @@ pub struct SystemBase {
 	swap_used: u64,
 	cpu_avg: f32,
 	net_interfaces: Vec<NetIfaceInfo>,
+	sys_networks: Networks,
 }
 
 impl SystemBase {
@@ -32,6 +33,7 @@ impl SystemBase {
 			swap_used: 0,
 			cpu_avg: 0.0,
 			net_interfaces: Vec::new(),
+			sys_networks: Networks::new_with_refreshed_list(),
 		}
 	}
 	pub fn refresh(&mut self) -> &SystemBase {
@@ -50,9 +52,9 @@ impl SystemBase {
 		// TODO: get CPU temp
 		self.cpu_avg = self.sys.global_cpu_usage();
 		// Network stats:
-		let networks = Networks::new_with_refreshed_list();
+		self.sys_networks.refresh(true);
 		let mut net_ifaces = Vec::new();
-			for (interface_name, net_data) in &networks {
+			for (interface_name, net_data) in &self.sys_networks {
 
 					let tx_bytes = net_data.transmitted();
 					let rx_bytes = net_data.received();
