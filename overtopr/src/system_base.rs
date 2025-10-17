@@ -1,6 +1,11 @@
+// general cross-platform library for system information
 use sysinfo::{
     Components, Disks, Networks, System,
 };
+// networking information from systemd-networkd dbus manager proxy object
+use zbus_systemd::network1::{LinkProxy, ManagerProxy};
+use zbus::Connection;
+use futures::executor;
 
 pub struct SystemBase {
 		// these types aren't final
@@ -50,7 +55,59 @@ impl SystemBase {
 						names.push_str(" ");
 				}
 				self.net_interfaces = names;
+				// TODO: get a struct filled with systemd-fetched information from this future
+				let systemd_info = executor::block_on(self.systemd_refresh());
 				self
+		}
+		// get information from systemd dbus proxy, if possible
+		// TODO: make the return type Option<SystemDFetchedInfoStruct> or something
+		async fn systemd_refresh(&mut self) -> Option<i32> {
+				let maybe_connection = Connection::session().await;
+				match maybe_connection {
+						Ok(connection) => {
+								// docs for network manager: https://docs.rs/zbus_systemd/latest/zbus_systemd/network1/struct.ManagerProxy.html
+								// provides proxy of: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.network1.html
+								// let netmanager = ManagerProxy::new(&connection);
+								let netmanager = executor::block_on(ManagerProxy::new(&connection));
+								match netmanager {
+										Ok(manager) => {
+												// In this case dbus was able to get a connection and create a manager proxy
+												// so here is where the work of actually getting network info can begin
+												let maybe_links = manager.list_links();
+												let links = executor::block_on(maybe_links);
+												match links {
+														Ok(linkvec) => {
+																for link in linkvec {
+																		// presumably these contain useful info...
+																		// gotta read some docs to find out what exactly...
+																		let link_index = link.0; // index of interface?
+																		let link_name = link.1; // interface name string?
+																		let link_oopath = link.2; // dbus internal identifier object?
+																		let maybe_linkobject = executor::block_on(LinkProxy::new(&connection,link_oopath));
+																		match maybe_linkobject {
+																				Ok(lo) => {
+																						// lo is a: https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.network1.html#Link%20Object
+																						let res_addrinfo = executor::block_on(lo.address_state());
+																						match res_addrinfo {
+																								Ok(addrinfo) => {
+																										// addrinfo is a string! the address? maybe?
+																								},
+																								Err(_) => (),
+																						}
+																				},
+																				Err(_) => (),
+																		}
+																}
+														},
+														Err(_) => (),
+												}
+										},
+										Err(_) => (),
+								}
+								Some(41)
+						},
+						Err(_) => None,
+				}
 		}
 		// example getter:
 		pub fn get_cpu_avg(&mut self) -> f32 {
