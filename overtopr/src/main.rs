@@ -16,7 +16,7 @@ use crate::system_base::SystemBase;
 fn refresh_and_print(base: &mut SystemBase) {
 	// this printing is all still very simple and I plan on changing it.
 	println!("CPU Stats --------------------------------------------------------------overtop");
-	println!("CPU avg: {}", base.get_cpu_avg());
+	println!("CPU avg: {}%", base.get_cpu_avg().round());
 	println!("CPU Cores information: [number - frequency - utilization]");
 	let mut brand = String::new();
 	let mut i:u32 = 0;
@@ -33,7 +33,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	println!("RAM and Swap Stats --------------------------------------------------------------");
 	println!("Memory Available: {} Memory Used: {} Memory Free: {}", base.get_mem_avail(), base.get_mem_used(),
 		base.get_mem_free());
-	println!("Swap Used: {}", base.get_cpu_avg());
+	println!("Swap Used: {}%", base.get_cpu_avg().round());
 	println!("Network Interface Stats ---------------------------------------------------------");
 	let mut ifaces = base.get_network_interfaces().clone();
 	ifaces.sort_by(|a,b| b.name.cmp(&a.name));
