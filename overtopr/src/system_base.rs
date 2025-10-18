@@ -11,6 +11,15 @@ pub struct NetIfaceInfo {
 		pub networks: Vec<IpAddr>,
 }
 
+#[derive(Clone)]
+pub struct CoreInfo {
+		pub name: String,
+		pub brand: String,
+		pub vendor_id: String,
+		pub freq: u64,
+		pub usage: f32,
+}
+
 pub struct SystemBase {
 	// these types aren't final
 	sys: System,
@@ -20,6 +29,7 @@ pub struct SystemBase {
 	swap_used: u64,
 	cpu_avg: f32,
 	net_interfaces: Vec<NetIfaceInfo>,
+	cores: Vec<CoreInfo>,
 	sys_networks: Networks,
 }
 
@@ -33,6 +43,7 @@ impl SystemBase {
 			swap_used: 0,
 			cpu_avg: 0.0,
 			net_interfaces: Vec::new(),
+			cores: Vec::new(),
 			sys_networks: Networks::new_with_refreshed_list(),
 		}
 	}
@@ -51,6 +62,18 @@ impl SystemBase {
 		// CPU:
 		// TODO: get CPU temp
 		self.cpu_avg = self.sys.global_cpu_usage();
+		let mut cores = Vec::new();
+			for cpu in self.sys.cpus() {
+					let core = CoreInfo {
+							name: cpu.name().to_string(),
+							brand: cpu.brand().to_string(),
+							vendor_id: cpu.vendor_id().to_string(),
+							freq: cpu.frequency(),
+							usage: cpu.cpu_usage(),
+					};
+					cores.push(core);
+			}
+			self.cores = cores.clone();
 		// Network stats:
 		self.sys_networks.refresh(true);
 		let mut net_ifaces = Vec::new();
@@ -90,5 +113,8 @@ impl SystemBase {
 	}
 	pub fn get_network_interfaces(&mut self) -> Vec<NetIfaceInfo> {
 		self.net_interfaces.clone()
+	}
+	pub fn get_cores(&mut self) -> Vec<CoreInfo> {
+		self.cores.clone()
 	}
 }

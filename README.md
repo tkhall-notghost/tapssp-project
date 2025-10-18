@@ -1,5 +1,5 @@
 # overtopr
-Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress.
+Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress. Screenshot is already out of date, etc. See roadmap for actual progress.
 
 ![Work in progress screenshot](early-wip.png)
 
@@ -36,10 +36,10 @@ Key:
   - [ ] Totals
 	- [ ] Temperature
 	- [x] Average CPU core utilization %
-	- [ ] Number of cores available
-	- [ ] CPU Model
-	- [ ] CPU Frequency
-  - [ ] CPU utilization % per-core
+	- [x] CPU Model
+  - [x] Number of cores available
+  - [x] CPU utilization % per-core
+  - [x] CPU Frequency per-core
 - [x] list current network interfaces
   - [x] list network interfaces
   - [x] IP address (inet) (if applicable)
