@@ -55,53 +55,11 @@ impl SystemBase {
 		// in a refresh function call to a sub-type
 
 		// start refreshing values from high-compatibility system module:
-		self.sys.refresh_all(); // TODO: limit refresh to only used fields, as demanded later
-		// Memory and Swap:
-		self.mem_used = self.sys.used_memory();
-		self.mem_avail = self.sys.available_memory();
-		self.mem_free = self.sys.free_memory();
-		self.swap_used = self.sys.used_swap();
-		// Components:
-		self.sys_components.refresh(true);
-		let mut temp_components = Vec::new();
-		for component in &self.sys_components {
-			if let Some(temperature) = component.temperature() {
-				temp_components.push((component.label().to_string(), temperature));
-			}
-		}
-		self.component_temps = temp_components;
-		// CPU:
-		self.cpu_avg = self.sys.global_cpu_usage();
-		let mut cores = Vec::new();
-		for cpu in self.sys.cpus() {
-			let core = CoreInfo {
-				name: cpu.name().to_string(),
-				brand: cpu.brand().to_string(),
-				freq: cpu.frequency(),
-				usage: cpu.cpu_usage(),
-			};
-			cores.push(core);
-		}
-		self.cores = cores.clone();
-		// Network stats:
-		self.sys_networks.refresh(true);
-		let mut net_ifaces = Vec::new();
-		for (interface_name, net_data) in &self.sys_networks {
-			let nets = net_data.ip_networks();
-			let mut ret_networks = Vec::new();
-			for n in nets {
-				ret_networks.push(n.addr);
-			}
-			let iface_info = NetIfaceInfo {
-				name: interface_name.to_string(),
-				tx_bytes: net_data.transmitted(),
-				rx_bytes: net_data.received(),
-				mac: net_data.mac_address(),
-				networks: ret_networks,
-			};
-			net_ifaces.push(iface_info);
-		}
-		self.net_interfaces = net_ifaces;
+		// self.sys.refresh_all(); // limit refresh to only used fields, as demanded later
+		self.refresh_memory(); // update memory and swap stats
+		self.refresh_components(); // used for component temperatures
+		self.refresh_networks(); // used for network interfaces and usage stats
+		self.refresh_cpu(); // used for cpu usage metrics
 		self
 	}
 	// example getter:
@@ -128,5 +86,61 @@ impl SystemBase {
 	}
 	pub fn get_comp_temps(&mut self) -> Vec<(String, f32)> {
 		self.component_temps.clone()
+	}
+	fn refresh_networks(&mut self) -> () {
+		// Network stats:
+		self.sys_networks.refresh(true);
+		let mut net_ifaces = Vec::new();
+		for (interface_name, net_data) in &self.sys_networks {
+			let nets = net_data.ip_networks();
+			let mut ret_networks = Vec::new();
+			for n in nets {
+				ret_networks.push(n.addr);
+			}
+			let iface_info = NetIfaceInfo {
+				name: interface_name.to_string(),
+				tx_bytes: net_data.transmitted(),
+				rx_bytes: net_data.received(),
+				mac: net_data.mac_address(),
+				networks: ret_networks,
+			};
+			net_ifaces.push(iface_info);
+		}
+		self.net_interfaces = net_ifaces;
+	}
+	fn refresh_components(&mut self) -> () {
+		// Components:
+		self.sys_components.refresh(true);
+		let mut temp_components = Vec::new();
+		for component in &self.sys_components {
+			if let Some(temperature) = component.temperature() {
+				temp_components.push((component.label().to_string(), temperature));
+			}
+		}
+		self.component_temps = temp_components;
+	}
+	fn refresh_memory(&mut self) -> () {
+		self.sys.refresh_memory();
+		// Memory and Swap:
+		self.mem_used = self.sys.used_memory();
+		self.mem_avail = self.sys.available_memory();
+		self.mem_free = self.sys.free_memory();
+		self.swap_used = self.sys.used_swap();
+	}
+	fn refresh_cpu(&mut self) -> () {
+		self.sys.refresh_cpu_all();
+		// CPU:
+		self.cpu_avg = self.sys.global_cpu_usage();
+		let mut cores = Vec::new();
+		for cpu in self.sys.cpus() {
+			let core = CoreInfo {
+				name: cpu.name().to_string(),
+				brand: cpu.brand().to_string(),
+				freq: cpu.frequency(),
+				usage: cpu.cpu_usage(),
+			};
+			cores.push(core);
+		}
+		self.cores = cores.clone();
 	}
 }
