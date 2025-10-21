@@ -1,5 +1,5 @@
 # overtopr
-Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress. Screenshot is already out of date, etc. See roadmap for actual progress.
+Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress. See roadmap for actual progress.
 
 ![Work in progress screenshot](early-wip.png)
 

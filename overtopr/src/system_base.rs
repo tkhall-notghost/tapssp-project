@@ -15,7 +15,6 @@ pub struct NetIfaceInfo {
 pub struct CoreInfo {
 		pub name: String,
 		pub brand: String,
-		pub vendor_id: String,
 		pub freq: u64,
 		pub usage: f32,
 }
@@ -67,7 +66,6 @@ impl SystemBase {
 					let core = CoreInfo {
 							name: cpu.name().to_string(),
 							brand: cpu.brand().to_string(),
-							vendor_id: cpu.vendor_id().to_string(),
 							freq: cpu.frequency(),
 							usage: cpu.cpu_usage(),
 					};
@@ -109,7 +107,7 @@ impl SystemBase {
 		self.mem_free
 	}
 	pub fn get_swap_used(&mut self) -> u64 {
-		self.mem_used
+		self.swap_used
 	}
 	pub fn get_network_interfaces(&mut self) -> Vec<NetIfaceInfo> {
 		self.net_interfaces.clone()

@@ -33,7 +33,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	println!("RAM and Swap Stats --------------------------------------------------------------");
 	println!("Memory Available: {} Memory Used: {} Memory Free: {}", base.get_mem_avail(), base.get_mem_used(),
 		base.get_mem_free());
-	println!("Swap Used: {}%", base.get_cpu_avg().round());
+	println!("Swap Used: {}%", base.get_swap_used());
 	println!("Network Interface Stats ---------------------------------------------------------");
 	let mut ifaces = base.get_network_interfaces().clone();
 	ifaces.sort_by(|a,b| b.name.cmp(&a.name));
