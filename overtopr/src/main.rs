@@ -15,37 +15,50 @@ use crate::system_base::SystemBase;
 // which causes an annoying flashing effect
 fn refresh_and_print(base: &mut SystemBase) {
 	// this printing is all still very simple and I plan on changing it.
-	println!("CPU Stats --------------------------------------------------------------overtop");
+	println!("CPU Stats --------------------------------------------------------------overtopr");
 	println!("CPU avg: {}%", base.get_cpu_avg().round());
 	println!("CPU Cores information: [number - frequency - utilization]");
 	let mut brand = String::new();
-	let mut i:u32 = 0;
+	let mut i: u32 = 0;
 	for c in base.get_cores() {
-			brand = c.brand.clone();
-			print!("[ {} - {}", c.name, c.freq);
-			print!(" - {}% ] ", c.usage.round());
-			if i!=0 && ((i%3) == 0) {
-				println!("");
-			}
-			i+=1;
+		brand = c.brand.clone();
+		print!("[ {} - {}", c.name, c.freq);
+		print!(" - {}% ] ", c.usage.round());
+		if i != 0 && ((i % 3) == 0) {
+			println!("");
+		}
+		i += 1;
 	}
-		println!("  brand: {} - {} cores",brand,i);
+	println!("  brand: {} - {} cores", brand, i);
 	println!("RAM and Swap Stats --------------------------------------------------------------");
-	println!("Memory Available: {} Memory Used: {} Memory Free: {}", base.get_mem_avail(), base.get_mem_used(),
-		base.get_mem_free());
+	println!(
+		"Memory Available: {} Memory Used: {} Memory Free: {}",
+		base.get_mem_avail(),
+		base.get_mem_used(),
+		base.get_mem_free()
+	);
 	println!("Swap Used: {}%", base.get_swap_used());
+	println!("Thermal Stats ---------------------------------------------------------");
+	let mut thermalstats = base.get_comp_temps().clone();
+	thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
+	for (component_string, celsius) in thermalstats {
+		println!("{} - {} celsius", component_string, celsius);
+	}
 	println!("Network Interface Stats ---------------------------------------------------------");
 	let mut ifaces = base.get_network_interfaces().clone();
-	ifaces.sort_by(|a,b| b.name.cmp(&a.name));
-		for iface in ifaces {
-			println!("");
-			println!("interface: {} - {}", iface.name, iface.mac);
-			println!("  tx bytes: {} - rx bytes: {} ",iface.tx_bytes, iface.rx_bytes);
-			let mut networks = iface.networks.clone();
-			networks.sort();
-			for network in networks {
-					print!("  IP: {},",network);
-			}
+	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
+	for iface in ifaces {
+		println!("");
+		println!("interface: {} - {}", iface.name, iface.mac);
+		println!(
+			"  tx bytes: {} - rx bytes: {} ",
+			iface.tx_bytes, iface.rx_bytes
+		);
+		let mut networks = iface.networks.clone();
+		networks.sort();
+		for network in networks {
+			print!("  IP: {},", network);
+		}
 	}
 	// end of output
 	println!("");

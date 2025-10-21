@@ -33,8 +33,8 @@ Key:
   - [x] Free
   - [x] Swap usage
 - List CPU utilization
-  - [ ] Totals
-	- [ ] Temperature
+  - [x] Totals
+	- [x] Temperature
 	- [x] Average CPU core utilization %
 	- [x] CPU Model
   - [x] Number of cores available
