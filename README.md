@@ -58,13 +58,11 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
 
 # Potentially relevant Rust crates
 
-- [sysinfo crate](https://doc.cuprate.org/sysinfo/index.html)
+- [sysinfo crate](https://doc.cuprate.org/sysinfo/index.html) Using this.
   - supports linux/bsd/windows/$LATESTNAMEFORAPPLEOS
   - basic system utilization info
   - limited network monitoring utility
-- [zbus_systemd crate](https://docs.rs/zbus_systemd/latest/zbus_systemd/)
-  - interface with all elements of systemd, but...
-  - I'm interested in [list_units](https://docs.rs/zbus_systemd/latest/zbus_systemd/systemd1/struct.ManagerProxy.html#method.list_units) which meets the corresponding [ListUnits() from the freedesktop spec](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.systemd1.html#ListUnits()).
-  - Also has more detailed network interface information for Linux systems supporting systemd
-- [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html)
+- [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html) Haven't used this yet.
   - Specifically useful for the [net module](https://docs.rs/procfs/latest/procfs/net/index.html)
+- [byte-unit](https://lib.rs/crates/byte-unit) Haven't used this yet.
+  - For dynamically selecting the right display SI prefix for displayed bit/byte values
