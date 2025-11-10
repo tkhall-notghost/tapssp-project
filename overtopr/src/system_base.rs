@@ -3,11 +3,21 @@ use core::net::IpAddr;
 use sysinfo::{Components, MacAddr, Networks, System};
 use byte_unit::{Byte,UnitType};
 
+
+// Used to print out a byte value in an appropriate unit. Not for bits! Binary only!
+// also preserves original bytes count as u64 in result tuple
+fn get_prettybytes(bytes:u64) -> (u64, String) {
+	let clonedbytes = bytes.clone();
+	let byteunit = Byte::from_u64(clonedbytes).get_appropriate_unit(UnitType::Binary);
+	let roundedstr = format!("{byteunit:.2}");
+	(clonedbytes,roundedstr)
+}
+
 #[derive(Clone)]
 pub struct NetIfaceInfo {
 	pub name: String,
-	pub tx_bytes: u64,
-	pub rx_bytes: u64,
+	pub tx_bytes: (u64,String),
+	pub rx_bytes: (u64,String),
 	pub mac: MacAddr,
 	pub networks: Vec<IpAddr>,
 }
@@ -63,13 +73,6 @@ impl SystemBase {
 		self.refresh_cpu(); // used for cpu usage metrics
 		self
 	}
-	// Used to print out a byte value in an appropriate unit. Not for bits! Binary only!
-	// also preserves original bytes count as u64 in result tuple
-		fn get_prettybytes(&mut self, bytes:u64) -> (u64, String) {
-			let byteunit = Byte::from_u64(bytes).get_appropriate_unit(UnitType::Binary);
-			let roundedstr = format!("{byteunit:.2}");
-			(bytes,roundedstr)
-	}
 	// example getter:
 	pub fn get_cpu_avg(&mut self) -> f32 {
 		self.cpu_avg
@@ -105,10 +108,12 @@ impl SystemBase {
 			for n in nets {
 				ret_networks.push(n.addr);
 			}
+			let tx = net_data.transmitted();
+			let rx = net_data.transmitted();
 			let iface_info = NetIfaceInfo {
 				name: interface_name.to_string(),
-				tx_bytes: net_data.transmitted(),
-				rx_bytes: net_data.received(),
+				tx_bytes: get_prettybytes(tx),
+				rx_bytes: get_prettybytes(rx),
 				mac: net_data.mac_address(),
 				networks: ret_networks,
 			};
@@ -131,9 +136,9 @@ impl SystemBase {
 		self.sys.refresh_memory();
 		// Memory and Swap:
 		// for each value, return tuple of raw bytes count as u64 and a pretty string
-		self.mem_used = self.get_prettybytes(self.sys.used_memory());
-		self.mem_avail = self.get_prettybytes(self.sys.available_memory());
-		self.mem_free = self.get_prettybytes(self.sys.free_memory());
+		self.mem_used = get_prettybytes(self.sys.used_memory());
+		self.mem_avail = get_prettybytes(self.sys.available_memory());
+		self.mem_free = get_prettybytes(self.sys.free_memory());
 		self.swap_used = self.sys.used_swap();
 	}
 	fn refresh_cpu(&mut self) -> () {

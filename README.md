@@ -1,5 +1,5 @@
 # overtopr
-Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress. See roadmap for actual progress.
+Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress. See roadmap for actual progress, screenshot is outdated.
 
 ![Work in progress screenshot](early-wip.png)
 
@@ -11,16 +11,8 @@ Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an ea
 - `cargo build`
 - `cargo run` to test. Ctrl-C to quit for now.
 
-## Summary overview
-
-I will try to implement as many of the below features as possible. However unlike "top" or similair system process monitors I want a CLI/TUI system overview from a more abstract level, without individual processes. Instead the most granular element of the system to inspect in the monitor will be the status of various system services, catering towards systemd units, but written with traits for extensibility for services of different init systems. The rest of the system monitor output will be typical (if more visually concise) system resource utilization you would expect from a normal system resource monitor.
-
-Since I don't intend on setting up a TUI unless time permits, the initial command will output the full system monitor summary to be piped into a pager or saved to a file. Then later I could add a flag to enable the TUI.
-
-I will be developing this on my Arch Linux machine targeting a typical Systemd environment. I hope that compatibilty will be broader than my distrobution, but I might not be able to make guarantees. In any case, anything which fails should fail safely.
-
 ## Feature roadmap
-I am including as much as I can think of under this feature roadmap in order of which features should be implemented first. This is not to be taken as my realistic expectations for what I may actually be able to finish before the project is due, but just an outline of what more could be done.
+I've changed this a bit, aside from the core feature milestones, which have all already been met.
 
 Key:
 - [ ] unimplemented
@@ -40,12 +32,24 @@ Key:
   - [x] Number of cores available
   - [x] CPU utilization % per-core
   - [x] CPU Frequency per-core
-- [x] list current network interfaces
+- [x] :white_check_mark: list current network interfaces
   - [x] list network interfaces
   - [x] IP address (inet) (if applicable)
   - [x] MAC address (link) (if applicable)
   - [x] Network interface statistics
+- [ ] Disk Utilization
+- [ ] OS Information
+  - [ ] General OS and version information
+  - [ ] Specific OS identifiers (Architecture / Edition / Codename / Version)
+  - [ ] Printout more specific values from /proc (if OS has /proc)
 - [ ] (stretch goal) usage text and limited arguments/flags for options
+  - "compact" mode - Only print out refreshing values, or specify only certain outputs (network,memory,cpu,disks or any subset)
+  - "snapshot" mode - Sample data only long enough for one monitor result print, for use by scripts
+  - "nocolors" mode - Don't use terminal colors in output text
+  - help
+- [ ] (stretch goal) Terminal Decoration
+  - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
+  - prettier general printout, maybe with some TUI framework?
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor.
 
@@ -57,5 +61,7 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - limited network monitoring utility
 - [byte-unit](https://lib.rs/crates/byte-unit) Using this.
   - For dynamically selecting the right display SI prefix for displayed byte values
+- [os_info crate](https://docs.rs/os_info/latest/os_info/) Haven't used this yet.
+  - For identifying the current platform such that more specific OS/Distro strings are supported
 - [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html) Haven't used this yet.
   - Specifically useful for the [net module](https://docs.rs/procfs/latest/procfs/net/index.html)

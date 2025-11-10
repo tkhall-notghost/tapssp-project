@@ -42,7 +42,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	let mut thermalstats = base.get_comp_temps().clone();
 	thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
 	for (component_string, celsius) in thermalstats {
-		println!("{} - {} celsius", component_string, celsius);
+		println!("{} - {:.1} celsius", component_string, celsius);
 	}
 	println!("Network Interface Stats ---------------------------------------------------------");
 	let mut ifaces = base.get_network_interfaces().clone();
@@ -51,8 +51,8 @@ fn refresh_and_print(base: &mut SystemBase) {
 		println!("");
 		println!("interface: {} - {}", iface.name, iface.mac);
 		println!(
-			"  tx bytes: {} - rx bytes: {} ",
-			iface.tx_bytes, iface.rx_bytes
+			"  tx: {} - rx: {} ",
+			iface.tx_bytes.1, iface.rx_bytes.1
 		);
 		let mut networks = iface.networks.clone();
 		networks.sort();
