@@ -27,12 +27,12 @@ Key:
 - [x] implemented
 - [x] :white_check_mark: implemented & pretty
 
-- [x] List memory utilization (RAM)
+- [x] :white_check_mark: List memory utilization (RAM)
   - [x] Used
   - [x] Available
   - [x] Free
   - [x] Swap usage
-- List CPU utilization
+- [x] :white_check_mark: List CPU utilization
   - [x] Totals
 	- [x] Temperature
 	- [x] Average CPU core utilization %
@@ -45,14 +45,7 @@ Key:
   - [x] IP address (inet) (if applicable)
   - [x] MAC address (link) (if applicable)
   - [x] Network interface statistics
-- [ ] (stretch-goal) list system services (systemd units by default)
-  - Active
-	- Running (resource utilization summary)
-	- Exited (and why it exited)
-  - Inactive
-  - Enabled/Disabled state
-  - Root or User service? (if supported by init system)
-- [ ] (stretch goal) TUI with Ncurses or something similar if time permits
+- [ ] (stretch goal) usage text and limited arguments/flags for options
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor.
 
@@ -62,7 +55,7 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - supports linux/bsd/windows/$LATESTNAMEFORAPPLEOS
   - basic system utilization info
   - limited network monitoring utility
-- [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html) Haven't used this yet.
-  - Specifically useful for the [net module](https://docs.rs/procfs/latest/procfs/net/index.html)
 - [byte-unit](https://lib.rs/crates/byte-unit) Using this.
   - For dynamically selecting the right display SI prefix for displayed byte values
+- [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html) Haven't used this yet.
+  - Specifically useful for the [net module](https://docs.rs/procfs/latest/procfs/net/index.html)
