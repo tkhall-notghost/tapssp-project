@@ -64,5 +64,5 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - limited network monitoring utility
 - [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html) Haven't used this yet.
   - Specifically useful for the [net module](https://docs.rs/procfs/latest/procfs/net/index.html)
-- [byte-unit](https://lib.rs/crates/byte-unit) Haven't used this yet.
-  - For dynamically selecting the right display SI prefix for displayed bit/byte values
+- [byte-unit](https://lib.rs/crates/byte-unit) Using this.
+  - For dynamically selecting the right display SI prefix for displayed byte values

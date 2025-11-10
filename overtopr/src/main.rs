@@ -33,11 +33,11 @@ fn refresh_and_print(base: &mut SystemBase) {
 	println!("RAM and Swap Stats --------------------------------------------------------------");
 	println!(
 		"Memory Available: {} Memory Used: {} Memory Free: {}",
-		base.get_mem_avail(),
-		base.get_mem_used(),
-		base.get_mem_free()
+		base.get_mem_avail().1,
+		base.get_mem_used().1,
+		base.get_mem_free().1
 	);
-	println!("Swap Used: {}%", base.get_swap_used());
+	println!("Swap Used: {}%", base.get_swap_used().1);
 	println!("Thermal Stats ---------------------------------------------------------");
 	let mut thermalstats = base.get_comp_temps().clone();
 	thermalstats.sort_by(|a, b| b.0.cmp(&a.0));

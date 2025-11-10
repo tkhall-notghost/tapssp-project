@@ -1,6 +1,7 @@
 // general cross-platform library for system information
 use core::net::IpAddr;
 use sysinfo::{Components, MacAddr, Networks, System};
+use byte_unit::{Byte,UnitType};
 
 #[derive(Clone)]
 pub struct NetIfaceInfo {
@@ -22,10 +23,10 @@ pub struct CoreInfo {
 pub struct SystemBase {
 	// these types aren't final
 	sys: System,
-	mem_used: u64,
-	mem_avail: u64,
-	mem_free: u64,
-	swap_used: u64,
+	mem_used: (u64,String),
+	mem_avail: (u64,String),
+	mem_free: (u64,String),
+	swap_used: (u64,String),
 	cpu_avg: f32,
 	net_interfaces: Vec<NetIfaceInfo>,
 	cores: Vec<CoreInfo>,
@@ -38,10 +39,10 @@ impl SystemBase {
 	pub fn new() -> SystemBase {
 		SystemBase {
 			sys: System::new_all(),
-			mem_used: 0,
-			mem_avail: 0,
-			mem_free: 0,
-			swap_used: 0,
+			mem_used: (0,String::from("N/A")),
+			mem_avail: (0,String::from("N/A")),
+			mem_free: (0,String::from("N/A")),
+			swap_used: (0,String::from("N/A")),
 			cpu_avg: 0.0,
 			net_interfaces: Vec::new(),
 			cores: Vec::new(),
@@ -62,21 +63,27 @@ impl SystemBase {
 		self.refresh_cpu(); // used for cpu usage metrics
 		self
 	}
+	// Used to print out a byte value in an appropriate unit. Not for bits! Binary only!
+	// also preserves original bytes count as u64 in result tuple
+	fn get_prettybytes(&mut self, bytes:u64) -> (u64, String) {
+			(bytes,
+			 Byte::from_u64(bytes).get_appropriate_unit(UnitType::Binary).to_string())
+	}
 	// example getter:
 	pub fn get_cpu_avg(&mut self) -> f32 {
 		self.cpu_avg
 	}
-	pub fn get_mem_used(&mut self) -> u64 {
-		self.mem_used
+	pub fn get_mem_used(&mut self) -> (u64,String) {
+		self.mem_used.clone()
 	}
-	pub fn get_mem_avail(&mut self) -> u64 {
-		self.mem_avail
+	pub fn get_mem_avail(&mut self) -> (u64,String) {
+		self.mem_avail.clone()
 	}
-	pub fn get_mem_free(&mut self) -> u64 {
-		self.mem_free
+	pub fn get_mem_free(&mut self) -> (u64,String) {
+		self.mem_free.clone()
 	}
-	pub fn get_swap_used(&mut self) -> u64 {
-		self.swap_used
+	pub fn get_swap_used(&mut self) -> (u64, String) {
+		self.swap_used.clone()
 	}
 	pub fn get_network_interfaces(&mut self) -> Vec<NetIfaceInfo> {
 		self.net_interfaces.clone()
@@ -122,10 +129,11 @@ impl SystemBase {
 	fn refresh_memory(&mut self) -> () {
 		self.sys.refresh_memory();
 		// Memory and Swap:
-		self.mem_used = self.sys.used_memory();
-		self.mem_avail = self.sys.available_memory();
-		self.mem_free = self.sys.free_memory();
-		self.swap_used = self.sys.used_swap();
+		// for each value, return tuple of raw bytes count as u64 and a pretty string
+		self.mem_used = self.get_prettybytes(self.sys.used_memory());
+		self.mem_avail = self.get_prettybytes(self.sys.available_memory());
+		self.mem_free = self.get_prettybytes(self.sys.free_memory());
+		self.swap_used = self.get_prettybytes(self.sys.used_swap());
 	}
 	fn refresh_cpu(&mut self) -> () {
 		self.sys.refresh_cpu_all();
