@@ -133,8 +133,8 @@ impl SystemBase {
 				let usage = disk.usage();
 				// TODO: convert the below to Strings
 				let _name = disk.name().to_str();
-				let _fs = disk.file_system();
-				let _mnt = disk.mount_point();
+				let _fs = disk.file_system().to_str();
+				let _mnt = disk.mount_point().to_str();
 				// TODO: actually use accurate strings
 				let dinfo = DiskInfo {
 						name: String::from("diskname"),

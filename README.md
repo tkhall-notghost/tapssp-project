@@ -38,6 +38,9 @@ Key:
   - [x] MAC address (link) (if applicable)
   - [x] Network interface statistics
 - [ ] Disk Utilization
+  - [ ] Disk metadata
+  - [ ] Disk utilization
+  - [ ] Disk bytes I/O in last refresh
 - [ ] OS Information
   - [ ] General OS and version information
   - [ ] Specific OS identifiers (Architecture / Edition / Codename / Version)
