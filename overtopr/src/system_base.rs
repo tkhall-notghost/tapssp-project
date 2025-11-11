@@ -1,6 +1,8 @@
 // general cross-platform library for system information
+use std::path::Path;
 use core::net::IpAddr;
-use sysinfo::{Components, MacAddr, Networks, System};
+use std::ffi::OsStr;
+use sysinfo::{Components, MacAddr, Networks, System, Disks};
 use byte_unit::{Byte,UnitType};
 
 
@@ -11,6 +13,26 @@ fn get_prettybytes(bytes:u64) -> (u64, String) {
 	let byteunit = Byte::from_u64(clonedbytes).get_appropriate_unit(UnitType::Binary);
 	let roundedstr = format!("{byteunit:.2}");
 	(clonedbytes,roundedstr)
+}
+/*
+let diskname = disk.name();
+				let disk_kind = disk.kind();
+				let diskfs = disk.file_system();
+				let diskmnt = disk.mount_point();
+				let disk_total = disk.total_space();
+				let disk_avail = disk.available_space();
+				let disk_read = disk.usage().read_bytes;
+let disk_written = disk.usage().written_bytes;
+ */
+// Information about a disk from a single refresh interval
+pub struct DiskInfo {
+		pub name:String,
+		pub fs:String,
+		pub mnt:String,
+		pub total:u64,
+		pub avail:u64,
+		pub read:u64,
+		pub written:u64,
 }
 
 #[derive(Clone)]
@@ -43,6 +65,8 @@ pub struct SystemBase {
 	sys_networks: Networks,
 	sys_components: Components,
 	component_temps: Vec<(String, f32)>,
+	disks: Disks,
+	diskinfos: Vec<DiskInfo>,
 }
 
 impl SystemBase {
@@ -59,6 +83,8 @@ impl SystemBase {
 			sys_networks: Networks::new_with_refreshed_list(),
 			sys_components: Components::new_with_refreshed_list(),
 			component_temps: Vec::new(),
+			disks: Disks::new_with_refreshed_list(),
+			diskinfos: Vec::new(),
 		}
 	}
 	pub fn refresh(&mut self) -> &SystemBase {
@@ -71,6 +97,7 @@ impl SystemBase {
 		self.refresh_components(); // used for component temperatures
 		self.refresh_networks(); // used for network interfaces and usage stats
 		self.refresh_cpu(); // used for cpu usage metrics
+		self.refresh_disks(); // used for disk usage metrics
 		self
 	}
 	// example getter:
@@ -97,6 +124,30 @@ impl SystemBase {
 	}
 	pub fn get_comp_temps(&mut self) -> Vec<(String, f32)> {
 		self.component_temps.clone()
+	}
+	fn refresh_disks(&mut self) -> () {
+		self.disks.refresh(true);
+		// Update disk stats:
+		let mut ret_disks = Vec::new();
+		for disk in self.disks.list() {
+				let usage = disk.usage();
+				// TODO: convert the below to Strings
+				let _name = disk.name().to_str();
+				let _fs = disk.file_system();
+				let _mnt = disk.mount_point();
+				// TODO: actually use accurate strings
+				let dinfo = DiskInfo {
+						name: String::from("diskname"),
+						fs: String::from("fstype"),
+						mnt: String::from("mnt"),
+						total: disk.total_space(),
+						avail: disk.available_space(),
+						read: usage.read_bytes,
+						written: usage.written_bytes,
+				};
+				ret_disks.push(dinfo);
+		}
+		self.diskinfos = ret_disks;
 	}
 	fn refresh_networks(&mut self) -> () {
 		// Network stats:
