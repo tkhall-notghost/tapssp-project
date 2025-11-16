@@ -129,6 +129,7 @@ impl SystemBase {
 		self.disks.refresh(true);
 		// Update disk stats:
 		let mut ret_disks = Vec::new();
+		let mut disknum = 0;
 		for disk in self.disks.list() {
 				let usage = disk.usage();
 				// TODO: convert the below to Strings
@@ -146,6 +147,7 @@ impl SystemBase {
 						written: usage.written_bytes,
 				};
 				ret_disks.push(dinfo);
+				disknum = disknum+1;
 		}
 		self.diskinfos = ret_disks;
 	}

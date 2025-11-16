@@ -41,15 +41,7 @@ Key:
   - [ ] Disk metadata
   - [ ] Disk utilization
   - [ ] Disk bytes I/O in last refresh
-- [ ] OS Information
-  - [ ] General OS and version information
-  - [ ] Specific OS identifiers (Architecture / Edition / Codename / Version)
-  - [ ] Printout more specific values from /proc (if OS has /proc)
-- [ ] (stretch goal) usage text and limited arguments/flags for options
-  - "compact" mode - Only print out refreshing values, or specify only certain outputs (network,memory,cpu,disks or any subset)
-  - "snapshot" mode - Sample data only long enough for one monitor result print, for use by scripts
-  - "nocolors" mode - Don't use terminal colors in output text
-  - help
+- [ ] Clean Ctrl-C interrupt, exit code zero
 - [ ] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
   - prettier general printout, maybe with some TUI framework?
@@ -64,7 +56,4 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - limited network monitoring utility
 - [byte-unit](https://lib.rs/crates/byte-unit) Using this.
   - For dynamically selecting the right display SI prefix for displayed byte values
-- [os_info crate](https://docs.rs/os_info/latest/os_info/) Haven't used this yet.
-  - For identifying the current platform such that more specific OS/Distro strings are supported
-- [Linux /proc fs interface crate](https://docs.rs/procfs/latest/procfs/index.html) Haven't used this yet.
-  - Specifically useful for the [net module](https://docs.rs/procfs/latest/procfs/net/index.html)
+- [ctrl-c crate](https://docs.rs/ctrlc/latest/ctrlc/) Not using this yet
