@@ -44,6 +44,13 @@ fn refresh_and_print(base: &mut SystemBase) {
 	for (component_string, celsius) in thermalstats {
 		println!("{} - {:.1} celsius", component_string, celsius);
 	}
+	println!("Disk Stats ---------------------------------------------------------");
+	println!("Name - filesystem - mountpoint - total - available - read - written");
+	for disk in base.get_disks() {
+			println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
+			println!("  {} - {}", disk.total, disk.avail);
+			println!("  {} - {}", disk.read, disk.written);
+	}
 	println!("Network Interface Stats ---------------------------------------------------------");
 	let mut ifaces = base.get_network_interfaces().clone();
 	ifaces.sort_by(|a, b| b.name.cmp(&a.name));

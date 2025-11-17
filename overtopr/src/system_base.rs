@@ -2,7 +2,7 @@
 use std::path::Path;
 use core::net::IpAddr;
 use std::ffi::OsStr;
-use sysinfo::{Components, MacAddr, Networks, System, Disks};
+use sysinfo::{Components, Disk, Disks, MacAddr, Networks, System};
 use byte_unit::{Byte,UnitType};
 
 
@@ -14,6 +14,14 @@ fn get_prettybytes(bytes:u64) -> (u64, String) {
 	let roundedstr = format!("{byteunit:.2}");
 	(clonedbytes,roundedstr)
 }
+// Used for creating indexed placeholder strings
+fn placeholdertitle(index:u16,title:String) -> String {
+	let mut retstring = String::from(title);
+	let indexstr = index.to_string();
+	retstring.push_str(indexstr.as_str());
+	return retstring
+}
+
 /*
 let diskname = disk.name();
 				let disk_kind = disk.kind();
@@ -25,6 +33,7 @@ let diskname = disk.name();
 let disk_written = disk.usage().written_bytes;
  */
 // Information about a disk from a single refresh interval
+#[derive(Clone)]
 pub struct DiskInfo {
 		pub name:String,
 		pub fs:String,
@@ -125,29 +134,51 @@ impl SystemBase {
 	pub fn get_comp_temps(&mut self) -> Vec<(String, f32)> {
 		self.component_temps.clone()
 	}
+	pub fn get_disks(&mut self) -> Vec<DiskInfo> {
+		self.diskinfos.clone()
+	}
 	fn refresh_disks(&mut self) -> () {
 		self.disks.refresh(true);
 		// Update disk stats:
 		let mut ret_disks = Vec::new();
-		let mut disknum = 0;
-		for disk in self.disks.list() {
+		// NOTE: Can't zip disks with the usual "enumerate" here since usize isn't specific enough and I need a specific int size for enumeration
+		// NOTE: If your number of mounted disks can't fit in a u16, seek help (65535 mounted disks, not including network mounts, required to panic here)
+		let dlength:u16 = self.disks.list().len() as u16;
+		let dnums:Vec<u16> = (0..dlength).into_iter().collect();
+		let enumdisks = self.disks.list().iter().zip(dnums);
+		// i for current (u16) disk index as enumerated fallback printout for strings
+		for (disk,i) in enumdisks {
 				let usage = disk.usage();
-				// TODO: convert the below to Strings
-				let _name = disk.name().to_str();
-				let _fs = disk.file_system().to_str();
-				let _mnt = disk.mount_point().to_str();
+				// convert the names below to Strings, allowing failures
+				let name = match disk.name().to_str() {
+						Some(n) => {
+								// luks mapped disks can have excessive names that are just a full UUID
+								if n.contains("luks") {String::from("luks disk")} else {String::from(n)}
+						},
+						None => { // Fallback string (should not occur on a typical OS)
+								placeholdertitle(i,String::from("Disk "))
+						},
+				};
+				let fs = match disk.file_system().to_str() {
+						Some(f) => String::from(f),
+						None => placeholdertitle(i,String::from("unknown fs "))
+				};
+				// luks mounts will have long uuid strings, so shorten those
+				let mnt = match disk.mount_point().to_str() {
+						Some (m) => String::from(m),
+						None => placeholdertitle(i,String::from("mount "))
+				};
 				// TODO: actually use accurate strings
 				let dinfo = DiskInfo {
-						name: String::from("diskname"),
-						fs: String::from("fstype"),
-						mnt: String::from("mnt"),
+						name: String::from(name),
+						fs: String::from(fs),
+						mnt: String::from(mnt),
 						total: disk.total_space(),
 						avail: disk.available_space(),
 						read: usage.read_bytes,
 						written: usage.written_bytes,
 				};
 				ret_disks.push(dinfo);
-				disknum = disknum+1;
 		}
 		self.diskinfos = ret_disks;
 	}

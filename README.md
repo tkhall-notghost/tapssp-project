@@ -37,10 +37,10 @@ Key:
   - [x] IP address (inet) (if applicable)
   - [x] MAC address (link) (if applicable)
   - [x] Network interface statistics
-- [ ] Disk Utilization
-  - [ ] Disk metadata
-  - [ ] Disk utilization
-  - [ ] Disk bytes I/O in last refresh
+- [x] Disk Utilization
+  - [x] Disk metadata
+  - [x] Disk utilization
+  - [x] Disk bytes I/O in last refresh
 - [ ] Clean Ctrl-C interrupt, exit code zero
 - [ ] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
