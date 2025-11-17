@@ -45,11 +45,13 @@ fn refresh_and_print(base: &mut SystemBase) {
 		println!("{} - {:.1} celsius", component_string, celsius);
 	}
 	println!("Disk Stats ---------------------------------------------------------");
-	println!("Name - filesystem - mountpoint - total - available - read - written");
+	println!("Name - filesystem - mountpoint ");
+	println!(" available / total");
+	println!(" live usage stats: read/write");
 	for disk in base.get_disks() {
 			println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
-			println!("  {} - {}", disk.total, disk.avail);
-			println!("  {} - {}", disk.read, disk.written);
+			println!("  {} / {} total", disk.avail.1, disk.total.1);
+			println!("  r:{} / w:{}", disk.read.1, disk.written.1);
 	}
 	println!("Network Interface Stats ---------------------------------------------------------");
 	let mut ifaces = base.get_network_interfaces().clone();

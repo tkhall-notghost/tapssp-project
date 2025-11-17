@@ -1,12 +1,12 @@
-// general cross-platform library for system information
-use std::path::Path;
 use core::net::IpAddr;
-use std::ffi::OsStr;
-use sysinfo::{Components, Disk, Disks, MacAddr, Networks, System};
+// general cross-platform library for system information
+use sysinfo::{Components, Disks, MacAddr, Networks, System};
+// used for get_prettybytes
 use byte_unit::{Byte,UnitType};
 
 
-// Used to print out a byte value in an appropriate unit. Not for bits! Binary only!
+// Used to print out a rounded (two decimals) byte value in an appropriate unit.
+// Not for bits! Binary only!
 // also preserves original bytes count as u64 in result tuple
 fn get_prettybytes(bytes:u64) -> (u64, String) {
 	let clonedbytes = bytes.clone();
@@ -38,10 +38,10 @@ pub struct DiskInfo {
 		pub name:String,
 		pub fs:String,
 		pub mnt:String,
-		pub total:u64,
-		pub avail:u64,
-		pub read:u64,
-		pub written:u64,
+		pub total:(u64,String),
+		pub avail:(u64,String),
+		pub read:(u64,String),
+		pub written:(u64,String),
 }
 
 #[derive(Clone)]
@@ -168,15 +168,14 @@ impl SystemBase {
 						Some (m) => String::from(m),
 						None => placeholdertitle(i,String::from("mount "))
 				};
-				// TODO: actually use accurate strings
 				let dinfo = DiskInfo {
 						name: String::from(name),
 						fs: String::from(fs),
 						mnt: String::from(mnt),
-						total: disk.total_space(),
-						avail: disk.available_space(),
-						read: usage.read_bytes,
-						written: usage.written_bytes,
+						total: get_prettybytes(disk.total_space()),
+						avail: get_prettybytes(disk.available_space()),
+						read: get_prettybytes(usage.read_bytes),
+						written: get_prettybytes(usage.written_bytes),
 				};
 				ret_disks.push(dinfo);
 		}

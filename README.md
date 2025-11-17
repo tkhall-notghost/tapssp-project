@@ -37,7 +37,7 @@ Key:
   - [x] IP address (inet) (if applicable)
   - [x] MAC address (link) (if applicable)
   - [x] Network interface statistics
-- [x] Disk Utilization
+- [x] :white_check_mark: Disk Utilization
   - [x] Disk metadata
   - [x] Disk utilization
   - [x] Disk bytes I/O in last refresh
