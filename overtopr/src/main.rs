@@ -84,9 +84,11 @@ static BEGIN_EXIT: AtomicBool = AtomicBool::new(false);
 
 fn main() -> Result<(), ctrlc::Error> {
     ctrlc::set_handler(|| {
+				// immediately clear screen to hide the "^C" that was just injected into the tty
+				clearscreen::clear().expect("failed to clear screen");
         println!("Exiting!!");
+				// set the static atomic bool which indicates to stop refresh-looping
 				BEGIN_EXIT.store(true,Ordering::Relaxed);
-        // std::process::exit(0);
     })?;
 	// create a generic SystemBase which represents our gathered System information
 	let mut base = SystemBase::new();
