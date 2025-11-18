@@ -9,19 +9,22 @@ use std::{thread, time::Duration};
 
 mod system_base;
 use crate::system_base::SystemBase;
+use crossterm::style::Stylize;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
 // this actually prints and then refreshes, to avoid waiting to print
 // while fetching system stats after the screen has just been cleared
 // which causes an annoying flashing effect
+// which is part of why the first print has no readouts
+// the other part being stats that require more than one sample
 fn refresh_and_print(base: &mut SystemBase) {
-	// this printing is all still very simple and I plan on changing it.
-	println!("CPU Stats --------------------------------------------------------------overtopr");
+	println!("{} --------------------------------------------------------------{}","CPU".bold(),"overtopr".bold());
 	println!("CPU avg: {}%", base.get_cpu_avg().round());
 	println!("CPU Cores information: [number - frequency - utilization]");
 	let mut brand = String::new();
 	let mut i: u32 = 0;
+	// TODO: Make this look a lot better
 	for c in base.get_cores() {
 		brand = c.brand.clone();
 		print!("[ {} - {}", c.name, c.freq);
@@ -32,21 +35,21 @@ fn refresh_and_print(base: &mut SystemBase) {
 		i += 1;
 	}
 	println!("  brand: {} - {} cores", brand, i);
-	println!("RAM and Swap Stats --------------------------------------------------------------");
+	println!("{} --------------------------------------------------------------","RAM and Swap".bold());
 	println!(
-		"Memory Available: {} Memory Used: {} Memory Free: {}",
-		base.get_mem_avail().1,
+		"Used: {} / Available: {} - Free: {}",
 		base.get_mem_used().1,
+		base.get_mem_avail().1,
 		base.get_mem_free().1
 	);
 	println!("Swap Used: {}%", base.get_swap_used());
-	println!("Thermal Stats ---------------------------------------------------------");
+	println!("{} ---------------------------------------------------------","Thermal".bold());
 	let mut thermalstats = base.get_comp_temps().clone();
 	thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
 	for (component_string, celsius) in thermalstats {
-		println!("{} - {:.1} celsius", component_string, celsius);
+		println!("{:.1} C - {} ", celsius, component_string);
 	}
-	println!("Disk Stats ---------------------------------------------------------");
+	println!("{} ---------------------------------------------------------","Disk".bold());
 	println!("Name - filesystem - mountpoint ");
 	println!(" available / total");
 	println!(" live usage stats: read/write");
@@ -55,12 +58,13 @@ fn refresh_and_print(base: &mut SystemBase) {
 			println!("  {} / {} total", disk.avail.1, disk.total.1);
 			println!("  r:{} / w:{}", disk.read.1, disk.written.1);
 	}
-	println!("Network Interface Stats ---------------------------------------------------------");
+	println!("{} ---------------------------------------------------------","Network Interface".bold());
 	let mut ifaces = base.get_network_interfaces().clone();
 	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
+	let mut firstiface = true;
 	for iface in ifaces {
-		println!("");
-		println!("interface: {} - {}", iface.name, iface.mac);
+		if !firstiface {println!("");}
+		println!(" {} - {}", iface.name, iface.mac);
 		println!(
 			"  tx: {} - rx: {} ",
 			iface.tx_bytes.1, iface.rx_bytes.1
@@ -70,6 +74,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 		for network in networks {
 			print!("  IP: {},", network);
 		}
+		firstiface = false;
 	}
 	// end of output
 	println!("");
