@@ -4,11 +4,13 @@ Overtopr - Rust system monitor. Student project by Tessa Hall.
 MIT License 2025
 
  */
-
+use ctrlc;
 use std::{thread, time::Duration};
 
 mod system_base;
 use crate::system_base::SystemBase;
+
+use std::sync::atomic::{AtomicBool, Ordering};
 
 // this actually prints and then refreshes, to avoid waiting to print
 // while fetching system stats after the screen has just been cleared
@@ -76,14 +78,24 @@ fn refresh_and_print(base: &mut SystemBase) {
 	SystemBase::refresh(base);
 }
 
-fn main() {
+// global atomic boolean only set by sigint handler (ctrlc)
+// checked between refreshes to cleanly terminate overtopr
+static BEGIN_EXIT: AtomicBool = AtomicBool::new(false);
+
+fn main() -> Result<(), ctrlc::Error> {
+    ctrlc::set_handler(|| {
+        println!("Exiting!!");
+				BEGIN_EXIT.store(true,Ordering::Relaxed);
+        // std::process::exit(0);
+    })?;
 	// create a generic SystemBase which represents our gathered System information
 	let mut base = SystemBase::new();
-	loop {
+	while BEGIN_EXIT.load(Ordering::Relaxed) == false {
 		// refresh system info and print it
 		refresh_and_print(&mut base);
 		// system stats refresh delay
 		thread::sleep(Duration::from_secs(2));
 		clearscreen::clear().expect("failed to clear screen");
 	}
+		Ok(())
 }

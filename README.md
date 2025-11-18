@@ -41,7 +41,7 @@ Key:
   - [x] Disk metadata
   - [x] Disk utilization
   - [x] Disk bytes I/O in last refresh
-- [ ] Clean Ctrl-C interrupt, exit code zero
+- [x] Clean Ctrl-C interrupt, exit code zero
 - [ ] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
   - prettier general printout, maybe with some TUI framework?
@@ -56,4 +56,4 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - limited network monitoring utility
 - [byte-unit](https://lib.rs/crates/byte-unit) Using this.
   - For dynamically selecting the right display SI prefix for displayed byte values
-- [ctrl-c crate](https://docs.rs/ctrlc/latest/ctrlc/) Not using this yet
+- [ctrl-c crate](https://docs.rs/ctrlc/latest/ctrlc/) Using this.
