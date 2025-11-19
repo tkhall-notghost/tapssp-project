@@ -13,6 +13,22 @@ use crossterm::style::Stylize;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
+// TODO: take an f32 representing a percentage (say, CPU core utilization)
+// Use crossterm stylize to print it as a styled percentage
+// with a color from green to red indicating utilization level
+fn print_percent(usage:f32) -> () {
+	// TODO: write and use this, no println!, only print!
+}
+// TODO: take two tuples with u64's representing bytes from measurements
+// where the first is the number of bytes used
+// and the second is the total or available
+// then print them in an appropriate color from green to red
+// indicating the amount used of the total
+// using the Strings from the tuples
+fn print_fraction((used,usedstr):(u64,String),(avail,availstr):(u64,String)) -> () {
+	// TODO: write and use this, no println!, only print!
+}
+
 // this actually prints and then refreshes, to avoid waiting to print
 // while fetching system stats after the screen has just been cleared
 // which causes an annoying flashing effect
