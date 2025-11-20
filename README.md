@@ -3,7 +3,7 @@ Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an ea
 
 ![Work in progress screenshot](early-wip.png)
 
-[Final project](https://fpl.cs.depaul.edu/cpitcher/courses/csc363/worksheets/project.html) (DePaul University internal link) for for my Theory and Practice of Safe Systems Programming CSC-463 class.
+[Final project](https://fpl.cs.depaul.edu/cpitcher/courses/csc363/worksheets/project.html) (DePaul University internal link) for for my Theory and Practice of Safe Systems Programming CSC-463 class. This is not an alternative to `top`, `ps` or any other process monitors; there is no process listing. This is a refreshing display of general computer system resource utilization aiming for breadth rather than depth.
 
 ## compilation/usage
 
@@ -41,16 +41,21 @@ Key:
   - [x] Disk metadata
   - [x] Disk utilization
   - [x] Disk bytes I/O in last refresh
-- [x] Clean Ctrl-C interrupt, exit code zero
+- [x] :white_check_mark: Clean Ctrl-C interrupt, exit code zero
 - [ ] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
 	- [x] percentages
-	- [ ] fractions
-  - prettier general printout, maybe with some TUI framework?
+	- [ ] fractions (RAM utilization / Disk utilization)
+	- [ ] temperatures (temperatures near device-critical marked red)
+  - prettier general printout
+	- [ ] make CPU cores printout utilize terminal columns efficiently (hard!)
+	- [ ] pretty padding/spacing
+	- [ ] custom terminal title [Overtopr - CPU avg %]
+	- [ ] clickable help links for information about a metric online, ex: underlined "[?]"
 
-Basically, this would serve as an okay if very basic and broad Linux server monitor.
+Basically, this would serve as an okay if very basic and broad Linux server monitor. However, there is tested support for Linux, Mac, and Windows (caveat: Windows doesn't expose hardware components information via the sysinfo crate, so it doesn't have thermals).
 
-# Potentially relevant Rust crates
+# Rust crates used
 
 - [sysinfo crate](https://doc.cuprate.org/sysinfo/index.html) Using this.
   - supports linux/bsd/windows/$LATESTNAMEFORAPPLEOS
@@ -58,4 +63,6 @@ Basically, this would serve as an okay if very basic and broad Linux server moni
   - limited network monitoring utility
 - [byte-unit](https://lib.rs/crates/byte-unit) Using this.
   - For dynamically selecting the right display SI prefix for displayed byte values
-- [ctrl-c crate](https://docs.rs/ctrlc/latest/ctrlc/) Using this.
+- [ctrl-c crate](https://docs.rs/ctrlc/latest/ctrlc/) Using this for clean-exit.
+- [clearscreen crate](https://docs.rs/clearscreen/latest/clearscreen/) Using this for screen refreshes.
+- [crossterm crate](https://docs.rs/crossterm/latest/crossterm/) Using this for terminal colors/styles.

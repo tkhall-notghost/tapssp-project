@@ -48,13 +48,13 @@ fn refresh_and_print(base: &mut SystemBase) {
 	print!("CPU avg: ");
 	print_percent(base.get_cpu_avg());
 	println!("");
-	println!("CPU Cores information: [number - frequency - utilization]");
+	println!("CPU Cores information:");
 	let mut brand = String::new();
 	let mut i: u32 = 0;
 	// TODO: Make this look a lot better
 	for c in base.get_cores() {
 		brand = c.brand.clone();
-		print!("[ {} - {} - ", c.name, c.freq);
+		print!("[ {} - ", c.name);
 		print_percent(c.usage);
 		print!(" ] ");
 		if i != 0 && ((i % 3) == 0) {
