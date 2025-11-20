@@ -17,7 +17,16 @@ use std::sync::atomic::{AtomicBool, Ordering};
 // Use crossterm stylize to print it as a styled percentage
 // with a color from green to red indicating utilization level
 fn print_percent(usage:f32) -> () {
-	// TODO: write and use this, no println!, only print!
+		// TODO: write and use this, no println!, only print!
+		let round = usage.round();
+		let usgstr = round.to_string();
+		if round > 50.0 {
+				print!("{}%", usgstr.red());
+		} else if round > 25.0 {
+				print!("{}%", usgstr.yellow());
+		} else {
+				print!("{}%", usgstr.green());
+		}
 }
 // TODO: take two tuples with u64's representing bytes from measurements
 // where the first is the number of bytes used
@@ -36,15 +45,18 @@ fn print_fraction((used,usedstr):(u64,String),(avail,availstr):(u64,String)) -> 
 // the other part being stats that require more than one sample
 fn refresh_and_print(base: &mut SystemBase) {
 	println!("{} --------------------------------------------------------------{}","CPU".bold(),"overtopr".bold());
-	println!("CPU avg: {}%", base.get_cpu_avg().round());
+	print!("CPU avg: ");
+	print_percent(base.get_cpu_avg());
+	println!("");
 	println!("CPU Cores information: [number - frequency - utilization]");
 	let mut brand = String::new();
 	let mut i: u32 = 0;
 	// TODO: Make this look a lot better
 	for c in base.get_cores() {
 		brand = c.brand.clone();
-		print!("[ {} - {}", c.name, c.freq);
-		print!(" - {}% ] ", c.usage.round());
+		print!("[ {} - {} - ", c.name, c.freq);
+		print_percent(c.usage);
+		print!(" ] ");
 		if i != 0 && ((i % 3) == 0) {
 			println!("");
 		}
@@ -58,12 +70,23 @@ fn refresh_and_print(base: &mut SystemBase) {
 		base.get_mem_avail().1,
 		base.get_mem_free().1
 	);
-	println!("Swap Used: {}%", base.get_swap_used());
-	println!("{} ---------------------------------------------------------","Thermal".bold());
+	let cswap = base.get_swap_used();
+	print!("Swap Used: ");
+	// Highlight any swap usage with red
+	if cswap > 0 {
+		print!("{}%",cswap.to_string().red());
+	} else {
+		print!("{}%",cswap.to_string().green());
+	}
+	println!("");
+	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
 	let mut thermalstats = base.get_comp_temps().clone();
-	thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
-	for (component_string, celsius) in thermalstats {
-		println!("{:.1} C - {} ", celsius, component_string);
+	if thermalstats.len() != 0 {
+			println!("{} ---------------------------------------------------------","Thermal".bold());
+			thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
+			for (component_string, celsius) in thermalstats {
+					println!("{:.1} C - {} ", celsius, component_string);
+			}
 	}
 	println!("{} ---------------------------------------------------------","Disk".bold());
 	println!("Name - filesystem - mountpoint ");

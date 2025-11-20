@@ -44,6 +44,8 @@ Key:
 - [x] Clean Ctrl-C interrupt, exit code zero
 - [ ] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
+	- [x] percentages
+	- [ ] fractions
   - prettier general printout, maybe with some TUI framework?
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor.
