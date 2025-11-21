@@ -157,7 +157,8 @@ impl SystemBase {
 				Some(n) => {
 					// luks mapped disks can have excessive names that are just a full UUID
 					if n.contains("luks") {
-						String::from("luks disk")
+							let luks = String::from("luks disk ");
+							placeholdertitle(i,luks)
 					} else if n.is_empty() {
 						placeholdertitle(i, String::from("Disk "))
 					} else {

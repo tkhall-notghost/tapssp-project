@@ -70,18 +70,76 @@ fn print_fraction((used, _): (u64, String), (avail, _): (u64, String)) {
 	print_percent(percent32);
 }
 
-/*
-Main printing and refreshing code for the core display logic of overtopr.
+// print all network statistics for all interfaces
+fn print_net(base: &mut SystemBase) {
+	print_div(String::from("Network Interfaces"));
+	let mut ifaces = base.get_network_interfaces().clone();
+	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
+	let mut firstiface = true;
+	for iface in ifaces {
+		if !firstiface {println!();}
+		println!(" {} - {}", iface.name, iface.mac);
+		println!("  tx: {} - rx: {} ", iface.tx_bytes.1, iface.rx_bytes.1);
+		let mut networks = iface.networks.clone();
+		networks.sort();
+		for network in networks {
+			print!("  IP: {},", network);
+		}
+		firstiface = false;
+	}
+}
 
-This actually prints and then refreshes, to avoid waiting to print
-while fetching system stats after the screen has just been cleared
-which causes an annoying flashing effect.
-Part of why the first print has no readouts,
-the other part being many stats that require more than one sample
-in order to display a meaningful metric.
-*/
-fn refresh_and_print(base: &mut SystemBase) {
-	println!("{}", "overtopr".bold().dark_magenta());
+// print all disk stats for all disks
+fn print_disk(base: &mut SystemBase) {
+	print_div(String::from("Disk"));
+	for disk in base.get_disks() {
+		println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
+		print!("  ");
+		let used = disk.total.0 - disk.avail.0;
+		let usedt = (used, String::from(""));
+		print_fraction(usedt, disk.total.clone());
+		print!(" used. ");
+		println!(" {} Available of {} total", disk.avail.1, disk.total.1);
+		println!("  I/O r:{} / w:{}", disk.read.1, disk.written.1);
+	}
+}
+
+// function to print temperature information
+fn print_temp(base: &mut SystemBase) {
+	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
+	let mut thermalstats = base.get_comp_temps().clone();
+	if !thermalstats.is_empty() {
+		print_div(String::from("Thermal"));
+		thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
+		for (component_string, celsius) in thermalstats {
+			println!("{:.1}°C - {} ", celsius, component_string);
+		}
+	}
+}
+// function to print values pertaining to RAM and SWAP usage
+fn print_mem(base: &mut SystemBase) {
+	print_div(String::from("RAM and Swap"));
+	let used = base.get_mem_used();
+	let avail = base.get_mem_avail();
+	println!("Used: {}", used.1);
+	println!("Available: {}", avail.1);
+	println!("Free: {}", base.get_mem_free().1);
+	print!("Estimated RAM Usage: ");
+	print_fraction(used, avail);
+	println!();
+	let cswap = base.get_swap_used();
+	print!("Swap Used: ");
+	// any swap usage should show as red
+	if cswap.0 > 0 {
+		print!("{}", cswap.1.red());
+	} else {
+		print!("{}", cswap.1.green());
+	}
+	println!();
+}
+
+// function to print all CPU related metrics
+fn print_cpu(base: &mut SystemBase) {
 	print_div(String::from("CPU"));
 	print!("CPU avg: ");
 	print_percent(base.get_cpu_avg());
@@ -102,63 +160,26 @@ fn refresh_and_print(base: &mut SystemBase) {
 	}
 	// there won't be a newline at the end in this case, so add one then:
 	if i.is_multiple_of(4) {println!();}
-	println!("  brand: {} - {} cores", brand, i);
-	print_div(String::from("RAM and Swap"));
-	let used = base.get_mem_used();
-	let avail = base.get_mem_avail();
-	println!(
-		"Used: {} / Available: {} - Free: {}",
-		used.1,
-		avail.1,
-		base.get_mem_free().1
-	);
-	print!("Approx. RAM Used: ");
-	print_fraction(used, avail);
-	println!();
-	let cswap = base.get_swap_used();
-	print!("Swap Used: ");
-	// any swap usage should show as red
-	if cswap.0 > 0 {
-		print!("{}", cswap.1.red());
-	} else {
-		print!("{}", cswap.1.green());
-	}
-	println!();
-	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
-	let mut thermalstats = base.get_comp_temps().clone();
-	if !thermalstats.is_empty() {
-		print_div(String::from("Thermal"));
-		thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
-		for (component_string, celsius) in thermalstats {
-			println!("{:.1}°C - {} ", celsius, component_string);
-		}
-	}
-	print_div(String::from("Disk"));
-	for disk in base.get_disks() {
-		println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
-		print!("  ");
-		let used = disk.total.0 - disk.avail.0;
-		let usedt = (used, String::from(""));
-		print_fraction(usedt, disk.total.clone());
-		print!(" used. ");
-		println!(" {} Available of {} total", disk.avail.1, disk.total.1);
-		println!("  I/O r:{} / w:{}", disk.read.1, disk.written.1);
-	}
-	print_div(String::from("Network Interfaces"));
-	let mut ifaces = base.get_network_interfaces().clone();
-	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
-	let mut firstiface = true;
-	for iface in ifaces {
-		if !firstiface {println!();}
-		println!(" {} - {}", iface.name, iface.mac);
-		println!("  tx: {} - rx: {} ", iface.tx_bytes.1, iface.rx_bytes.1);
-		let mut networks = iface.networks.clone();
-		networks.sort();
-		for network in networks {
-			print!("  IP: {},", network);
-		}
-		firstiface = false;
-	}
+	println!("  brand: {} - {} cores", brand, i-1);
+}
+
+/*
+Main printing and refreshing code for the core display logic of overtopr.
+
+This actually prints and then refreshes, to avoid waiting to print
+while fetching system stats after the screen has just been cleared
+which causes an annoying flashing effect.
+Part of why the first print has no readouts,
+the other part being many stats that require more than one sample
+in order to display a meaningful metric.
+*/
+fn refresh_and_print(base: &mut SystemBase) {
+	println!("{}", "overtopr".bold().dark_magenta());
+	print_cpu(base);
+	print_mem(base);
+	print_temp(base);
+	print_disk(base);
+	print_net(base);
 	// end of output
 	println!();
 	println!("----- Ctrl-C to exit -----");
