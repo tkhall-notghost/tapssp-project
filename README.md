@@ -45,12 +45,10 @@ Key:
 - [ ] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
 	- [x] percentages
-	- [ ] fractions (RAM utilization / Disk utilization)
-	- [ ] temperatures (temperatures near device-critical marked red)
+	- [x] fractions (RAM utilization / Disk utilization)
   - prettier general printout
-	- [ ] make CPU cores printout utilize terminal columns efficiently (hard!)
-	- [ ] pretty padding/spacing
-	- [ ] custom terminal title [Overtopr - CPU avg %]
+	- [x] make CPU cores printout utilize terminal columns efficiently
+	- [x] pretty padding/spacing
 	- [ ] clickable help links for information about a metric online, ex: underlined "[?]"
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor. However, there is tested support for Linux, Mac, and Windows (caveat: Windows doesn't expose hardware components information via the sysinfo crate, so it doesn't have thermals).

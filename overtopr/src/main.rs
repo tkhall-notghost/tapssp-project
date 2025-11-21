@@ -13,6 +13,19 @@ use crossterm::style::Stylize;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
+fn print_div(dtitle:String) -> () {
+	let charquota:u16 = 68;
+	let mut tlen = 0;
+	// get length as u16 instead of usize
+	for _ in dtitle.chars() {tlen = tlen+1;}
+	let mut dashes = charquota - tlen;
+	print!("{}",dtitle.bold());
+	while dashes > 0 {
+		print!("-");
+		dashes = dashes - 1;
+	}
+	println!("");
+}
 // TODO: take an f32 representing a percentage (say, CPU core utilization)
 // Use crossterm stylize to print it as a styled percentage
 // with a color from green to red indicating utilization level
@@ -33,9 +46,12 @@ fn print_percent(usage:f32) -> () {
 // and the second is the total or available
 // then print them in an appropriate color from green to red
 // indicating the amount used of the total
-// using the Strings from the tuples
-fn print_fraction((used,usedstr):(u64,String),(avail,availstr):(u64,String)) -> () {
-	// TODO: write and use this, no println!, only print!
+fn print_fraction((used,_):(u64,String),(avail,_):(u64,String)) -> () {
+	// get percentage of bytes used:
+	let usedf = used as f32;
+	let availf = avail as f32;
+	let percent32:f32 = (usedf/availf)*100.0;
+	print_percent(percent32);
 }
 
 // this actually prints and then refreshes, to avoid waiting to print
@@ -44,36 +60,43 @@ fn print_fraction((used,usedstr):(u64,String),(avail,availstr):(u64,String)) -> 
 // which is part of why the first print has no readouts
 // the other part being stats that require more than one sample
 fn refresh_and_print(base: &mut SystemBase) {
-	println!("{} --------------------------------------------------------------{}","CPU".bold(),"overtopr".bold());
+	println!("{}","overtopr".bold().dark_magenta());
+	print_div(String::from("CPU"));
 	print!("CPU avg: ");
 	print_percent(base.get_cpu_avg());
 	println!("");
 	println!("CPU Cores information:");
 	let mut brand = String::new();
-	let mut i: u32 = 0;
+	let mut i: u32 = 1;
 	// TODO: Make this look a lot better
 	for c in base.get_cores() {
 		brand = c.brand.clone();
 		print!("[ {} - ", c.name);
 		print_percent(c.usage);
 		print!(" ] ");
-		if i != 0 && ((i % 3) == 0) {
+		if((i % 4) == 0) && (i!=1) {
 			println!("");
 		}
 		i += 1;
 	}
+	// there won't be a newline at the end in this case, so add one then:
+	if (i%4) == 0 {println!("");}
 	println!("  brand: {} - {} cores", brand, i);
-	println!("{} --------------------------------------------------------------","RAM and Swap".bold());
+	print_div(String::from("RAM and Swap"));
+	let used = base.get_mem_used();
+	let avail = base.get_mem_avail();
 	println!(
 		"Used: {} / Available: {} - Free: {}",
-		base.get_mem_used().1,
-		base.get_mem_avail().1,
+		used.1,
+		avail.1,
 		base.get_mem_free().1
 	);
+	print!("Approx. RAM Used: ");
+	print_fraction(used,avail);
+	println!("");
 	let cswap = base.get_swap_used();
 	print!("Swap Used: ");
-	// TODO: FIX THIS, SHOULD DISPLAY BYTE VALUE, NOT PERCENTAGE!!
-	// Highlight any swap usage with red
+	// any swap usage should show as red
 	if cswap.0 > 0 {
 		print!("{}",cswap.1.red());
 	} else {
@@ -83,22 +106,24 @@ fn refresh_and_print(base: &mut SystemBase) {
 	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
 	let mut thermalstats = base.get_comp_temps().clone();
 	if thermalstats.len() != 0 {
-			println!("{} ---------------------------------------------------------","Thermal".bold());
+			print_div(String::from("Thermal"));
 			thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
 			for (component_string, celsius) in thermalstats {
 					println!("{:.1} C - {} ", celsius, component_string);
 			}
 	}
-	println!("{} ---------------------------------------------------------","Disk".bold());
-	println!("Name - filesystem - mountpoint ");
-	println!(" available / total");
-	println!(" live usage stats: read/write");
+	print_div(String::from("Disk"));
 	for disk in base.get_disks() {
 			println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
-			println!("  {} / {} total", disk.avail.1, disk.total.1);
-			println!("  r:{} / w:{}", disk.read.1, disk.written.1);
+			print!("  ");
+			let used = disk.total.0 - disk.avail.0;
+			let usedt = (used,String::from(""));
+			print_fraction(usedt,disk.total.clone());
+			print!(" used. ");
+			println!(" {} Available of {} total", disk.avail.1, disk.total.1);
+			println!("  I/O r:{} / w:{}", disk.read.1, disk.written.1);
 	}
-	println!("{} ---------------------------------------------------------","Network Interface".bold());
+	print_div(String::from("Network Interfaces"));
 	let mut ifaces = base.get_network_interfaces().clone();
 	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
 	let mut firstiface = true;
@@ -118,7 +143,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	}
 	// end of output
 	println!("");
-	println!("---------------Ctrl-C to exit-----------");
+	println!("----- Ctrl-C to exit -----");
 	// run a refresh, update all SystemBase values to reflect current system stats
 	SystemBase::refresh(base);
 }
