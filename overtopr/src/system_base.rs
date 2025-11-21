@@ -153,7 +153,9 @@ impl SystemBase {
 				let name = match disk.name().to_str() {
 						Some(n) => {
 								// luks mapped disks can have excessive names that are just a full UUID
-								if n.contains("luks") {String::from("luks disk")} else {String::from(n)}
+								if n.contains("luks") {String::from("luks disk")}
+								else if n == "" {placeholdertitle(i,String::from("Disk "))}
+								else {String::from(n)}
 						},
 						None => { // Fallback string (should not occur on a typical OS)
 								placeholdertitle(i,String::from("Disk "))
