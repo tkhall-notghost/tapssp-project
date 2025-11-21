@@ -1,7 +1,9 @@
 # overtopr
 Overtopr is a system monitor written in Rust by **Tessa Hall**.
 
-![Work in progress screenshot](early-wip.png)
+## screenshots
+- Linux
+  - ![Linux Screenshot](linux.png)
 
 [Final project](https://fpl.cs.depaul.edu/cpitcher/courses/csc363/worksheets/project.html) (DePaul University internal link) for for my Theory and Practice of Safe Systems Programming CSC-463 class. This is not an alternative to `top`, `ps` or any other process monitors; there is no process listing. This is a refreshing display of general computer system resource utilization aiming for breadth rather than depth.
 
