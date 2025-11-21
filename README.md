@@ -3,7 +3,15 @@ Overtopr is a system monitor written in Rust by **Tessa Hall**.
 
 ## screenshots
 - Linux
+  - Arch Linux x86_64 Linux kernel: 6.12.58-1-lts
   - ![Linux Screenshot](linux.png)
+- MacOS
+  - Notes:
+	- Tested on macOS Moneterey - Version 12.7.4 within a virtual machine on my Linux host.
+	- Swap usage is not recorded on MacOS
+	- Estimated RAM usage in this screenshot (over 100%) results from Swap not being distinguished from RAM and low total RAM availability.
+	- Thermals are unavailable, whether due to macOS, or being in a VM, I am unsure. I made no attempt to pass thermals for devices through to the VM.
+  - ![MacOS Screenshot](macos.png)
 
 [Final project](https://fpl.cs.depaul.edu/cpitcher/courses/csc363/worksheets/project.html) (DePaul University internal link) for for my Theory and Practice of Safe Systems Programming CSC-463 class. This is not an alternative to `top`, `ps` or any other process monitors; there is no process listing. This is a refreshing display of general computer system resource utilization aiming for breadth rather than depth.
 
