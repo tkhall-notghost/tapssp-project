@@ -4,63 +4,87 @@ Overtopr - Rust system monitor. Student project by Tessa Hall.
 MIT License 2025
 
  */
-use ctrlc;
-use std::{thread, time::Duration};
 
+// clean exiting
+use ctrlc;
+use std::sync::atomic::{AtomicBool, Ordering};
+// refresh delay
+use std::{thread, time::Duration};
+// colors and text styles
+use crossterm::style::Stylize;
+// system monitor data collection internals
 mod system_base;
 use crate::system_base::SystemBase;
-use crossterm::style::Stylize;
 
-use std::sync::atomic::{AtomicBool, Ordering};
-
-fn print_div(dtitle:String) -> () {
-	let charquota:u16 = 68;
+/*
+Print a subsections header line of standard length.
+Number of chars in title string MUST fit within u16.
+Number of chars in title SHOULD NOT exceed 66.
+*/
+fn print_div(dtitle: String) -> () {
+	let charquota: u16 = 68;
 	let mut tlen = 0;
 	// get length as u16 instead of usize
-	for _ in dtitle.chars() {tlen = tlen+1;}
+	for _ in dtitle.chars() {
+		tlen = tlen + 1;
+	}
 	let mut dashes = charquota - tlen;
-	print!("{}",dtitle.bold());
+	print!("{}", dtitle.bold());
 	while dashes > 0 {
 		print!("-");
 		dashes = dashes - 1;
 	}
 	println!("");
 }
-// TODO: take an f32 representing a percentage (say, CPU core utilization)
-// Use crossterm stylize to print it as a styled percentage
-// with a color from green to red indicating utilization level
-fn print_percent(usage:f32) -> () {
-		// TODO: write and use this, no println!, only print!
-		let round = usage.round();
-		let usgstr = round.to_string();
+
+/*
+Takes an f32 representing a percentage and prints it prettily inline.
+
+Ex: CPU core utilization
+Printed without a newline with a color from green to red indicating utilization level.
+*/
+fn print_percent(usage: f32) -> () {
+	// TODO: write and use this, no println!, only print!
+	let round = usage.round();
+	let usgstr = round.to_string();
+	// pick color based on percentage thresholds
+	let color: crossterm::style::Color = {
 		if round > 50.0 {
-				print!("{}%", usgstr.red());
+			crossterm::style::Color::Red
 		} else if round > 25.0 {
-				print!("{}%", usgstr.yellow());
+			crossterm::style::Color::Yellow
 		} else {
-				print!("{}%", usgstr.green());
+			crossterm::style::Color::Green
 		}
+	};
+	print!("{}%", usgstr.with(color));
 }
-// TODO: take two tuples with u64's representing bytes from measurements
-// where the first is the number of bytes used
-// and the second is the total or available
-// then print them in an appropriate color from green to red
-// indicating the amount used of the total
-fn print_fraction((used,_):(u64,String),(avail,_):(u64,String)) -> () {
+/*
+Takes two system-metric tuples from SystemBase and returns a pretty percentage printout.
+
+Junk values are permissible in the tuple string values.
+Arguments are only tuples for ease of use with SystemBase.
+*/
+fn print_fraction((used, _): (u64, String), (avail, _): (u64, String)) -> () {
 	// get percentage of bytes used:
 	let usedf = used as f32;
 	let availf = avail as f32;
-	let percent32:f32 = (usedf/availf)*100.0;
+	let percent32: f32 = (usedf / availf) * 100.0;
 	print_percent(percent32);
 }
 
-// this actually prints and then refreshes, to avoid waiting to print
-// while fetching system stats after the screen has just been cleared
-// which causes an annoying flashing effect
-// which is part of why the first print has no readouts
-// the other part being stats that require more than one sample
+/*
+Main printing and refreshing code for the core display logic of overtopr.
+
+This actually prints and then refreshes, to avoid waiting to print
+while fetching system stats after the screen has just been cleared
+which causes an annoying flashing effect.
+Part of why the first print has no readouts,
+the other part being many stats that require more than one sample
+in order to display a meaningful metric.
+*/
 fn refresh_and_print(base: &mut SystemBase) {
-	println!("{}","overtopr".bold().dark_magenta());
+	println!("{}", "overtopr".bold().dark_magenta());
 	print_div(String::from("CPU"));
 	print!("CPU avg: ");
 	print_percent(base.get_cpu_avg());
@@ -74,13 +98,15 @@ fn refresh_and_print(base: &mut SystemBase) {
 		print!("[ {} - ", c.name);
 		print_percent(c.usage);
 		print!(" ] ");
-		if((i % 4) == 0) && (i!=1) {
+		if ((i % 4) == 0) && (i != 1) {
 			println!("");
 		}
 		i += 1;
 	}
 	// there won't be a newline at the end in this case, so add one then:
-	if (i%4) == 0 {println!("");}
+	if (i % 4) == 0 {
+		println!("");
+	}
 	println!("  brand: {} - {} cores", brand, i);
 	print_div(String::from("RAM and Swap"));
 	let used = base.get_mem_used();
@@ -92,48 +118,47 @@ fn refresh_and_print(base: &mut SystemBase) {
 		base.get_mem_free().1
 	);
 	print!("Approx. RAM Used: ");
-	print_fraction(used,avail);
+	print_fraction(used, avail);
 	println!("");
 	let cswap = base.get_swap_used();
 	print!("Swap Used: ");
 	// any swap usage should show as red
 	if cswap.0 > 0 {
-		print!("{}",cswap.1.red());
+		print!("{}", cswap.1.red());
 	} else {
-		print!("{}",cswap.1.green());
+		print!("{}", cswap.1.green());
 	}
 	println!("");
 	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
 	let mut thermalstats = base.get_comp_temps().clone();
 	if thermalstats.len() != 0 {
-			print_div(String::from("Thermal"));
-			thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
-			for (component_string, celsius) in thermalstats {
-					println!("{:.1} C - {} ", celsius, component_string);
-			}
+		print_div(String::from("Thermal"));
+		thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
+		for (component_string, celsius) in thermalstats {
+			println!("{:.1}°C - {} ", celsius, component_string);
+		}
 	}
 	print_div(String::from("Disk"));
 	for disk in base.get_disks() {
-			println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
-			print!("  ");
-			let used = disk.total.0 - disk.avail.0;
-			let usedt = (used,String::from(""));
-			print_fraction(usedt,disk.total.clone());
-			print!(" used. ");
-			println!(" {} Available of {} total", disk.avail.1, disk.total.1);
-			println!("  I/O r:{} / w:{}", disk.read.1, disk.written.1);
+		println!("{} - {} - {} ", disk.name, disk.fs, disk.mnt);
+		print!("  ");
+		let used = disk.total.0 - disk.avail.0;
+		let usedt = (used, String::from(""));
+		print_fraction(usedt, disk.total.clone());
+		print!(" used. ");
+		println!(" {} Available of {} total", disk.avail.1, disk.total.1);
+		println!("  I/O r:{} / w:{}", disk.read.1, disk.written.1);
 	}
 	print_div(String::from("Network Interfaces"));
 	let mut ifaces = base.get_network_interfaces().clone();
 	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
 	let mut firstiface = true;
 	for iface in ifaces {
-		if !firstiface {println!("");}
+		if !firstiface {
+			println!("");
+		}
 		println!(" {} - {}", iface.name, iface.mac);
-		println!(
-			"  tx: {} - rx: {} ",
-			iface.tx_bytes.1, iface.rx_bytes.1
-		);
+		println!("  tx: {} - rx: {} ", iface.tx_bytes.1, iface.rx_bytes.1);
 		let mut networks = iface.networks.clone();
 		networks.sort();
 		for network in networks {
@@ -152,14 +177,17 @@ fn refresh_and_print(base: &mut SystemBase) {
 // checked between refreshes to cleanly terminate overtopr
 static BEGIN_EXIT: AtomicBool = AtomicBool::new(false);
 
+/*
+Main function. Run at program start to handle refreshes, delay, and clean exiting.
+*/
 fn main() -> Result<(), ctrlc::Error> {
-    ctrlc::set_handler(|| {
-				// immediately clear screen to hide the "^C" that was just injected into the tty
-				clearscreen::clear().expect("failed to clear screen");
-        println!("Exiting!!");
-				// set the static atomic bool which indicates to stop refresh-looping
-				BEGIN_EXIT.store(true,Ordering::Relaxed);
-    })?;
+	ctrlc::set_handler(|| {
+		// immediately clear screen to hide the "^C" that was just injected into the tty
+		clearscreen::clear().expect("failed to clear screen");
+		println!("Exiting!!");
+		// set the static atomic bool which indicates to stop refresh-looping
+		BEGIN_EXIT.store(true, Ordering::Relaxed);
+	})?;
 	// create a generic SystemBase which represents our gathered System information
 	let mut base = SystemBase::new();
 	while BEGIN_EXIT.load(Ordering::Relaxed) == false {
@@ -169,5 +197,5 @@ fn main() -> Result<(), ctrlc::Error> {
 		thread::sleep(Duration::from_secs(2));
 		clearscreen::clear().expect("failed to clear screen");
 	}
-		Ok(())
+	Ok(())
 }

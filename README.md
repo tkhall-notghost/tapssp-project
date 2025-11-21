@@ -1,5 +1,5 @@
 # overtopr
-Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an early work in progress. See roadmap for actual progress, screenshot is outdated.
+Overtopr is a system monitor written in Rust by **Tessa Hall**.
 
 ![Work in progress screenshot](early-wip.png)
 
@@ -12,7 +12,7 @@ Overtopr will be a system monitor written in Rust by **Tessa Hall**. Still an ea
 - `cargo run` to test. Ctrl-C to quit for now.
 
 ## Feature roadmap
-I've changed this a bit, aside from the core feature milestones, which have all already been met.
+I've changed this a bit, aside from the core feature milestones, which have all already been met. Some extra optional features have been cut over time to prevent project scope creep and increased dependency compatibility issues across OSs.
 
 Key:
 - [ ] unimplemented
@@ -42,14 +42,13 @@ Key:
   - [x] Disk utilization
   - [x] Disk bytes I/O in last refresh
 - [x] :white_check_mark: Clean Ctrl-C interrupt, exit code zero
-- [ ] (stretch goal) Terminal Decoration
+- [x] (stretch goal) Terminal Decoration
   - color-code system monitor readouts between green, yellow, and red based on thresholds, red indicating "bad"/"high-utilization"
 	- [x] percentages
 	- [x] fractions (RAM utilization / Disk utilization)
   - prettier general printout
 	- [x] make CPU cores printout utilize terminal columns efficiently
 	- [x] pretty padding/spacing
-	- [ ] clickable help links for information about a metric online, ex: underlined "[?]"
 
 Basically, this would serve as an okay if very basic and broad Linux server monitor. However, there is tested support for Linux, Mac, and Windows (caveat: Windows doesn't expose hardware components information via the sysinfo crate, so it doesn't have thermals).
 
