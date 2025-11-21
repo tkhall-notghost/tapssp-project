@@ -67,7 +67,7 @@ pub struct SystemBase {
 	mem_used: (u64,String),
 	mem_avail: (u64,String),
 	mem_free: (u64,String),
-	swap_used: u64,
+	swap_used: (u64,String),
 	cpu_avg: f32,
 	net_interfaces: Vec<NetIfaceInfo>,
 	cores: Vec<CoreInfo>,
@@ -85,7 +85,7 @@ impl SystemBase {
 			mem_used: (0,String::from("N/A")),
 			mem_avail: (0,String::from("N/A")),
 			mem_free: (0,String::from("N/A")),
-			swap_used: 0,
+			swap_used: (0,String::from("N/A")),
 			cpu_avg: 0.0,
 			net_interfaces: Vec::new(),
 			cores: Vec::new(),
@@ -122,8 +122,8 @@ impl SystemBase {
 	pub fn get_mem_free(&mut self) -> (u64,String) {
 		self.mem_free.clone()
 	}
-	pub fn get_swap_used(&mut self) -> u64 {
-		self.swap_used
+	pub fn get_swap_used(&mut self) -> (u64,String) {
+		self.swap_used.clone()
 	}
 	pub fn get_network_interfaces(&mut self) -> Vec<NetIfaceInfo> {
 		self.net_interfaces.clone()
@@ -222,7 +222,7 @@ impl SystemBase {
 		self.mem_used = get_prettybytes(self.sys.used_memory());
 		self.mem_avail = get_prettybytes(self.sys.available_memory());
 		self.mem_free = get_prettybytes(self.sys.free_memory());
-		self.swap_used = self.sys.used_swap();
+		self.swap_used = get_prettybytes(self.sys.used_swap());
 	}
 	fn refresh_cpu(&mut self) -> () {
 		self.sys.refresh_cpu_all();

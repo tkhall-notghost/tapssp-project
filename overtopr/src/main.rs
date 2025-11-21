@@ -72,11 +72,12 @@ fn refresh_and_print(base: &mut SystemBase) {
 	);
 	let cswap = base.get_swap_used();
 	print!("Swap Used: ");
+	// TODO: FIX THIS, SHOULD DISPLAY BYTE VALUE, NOT PERCENTAGE!!
 	// Highlight any swap usage with red
-	if cswap > 0 {
-		print!("{}%",cswap.to_string().red());
+	if cswap.0 > 0 {
+		print!("{}",cswap.1.red());
 	} else {
-		print!("{}%",cswap.to_string().green());
+		print!("{}",cswap.1.green());
 	}
 	println!("");
 	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
