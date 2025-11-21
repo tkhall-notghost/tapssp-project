@@ -12,7 +12,7 @@ Not for bits! Binary only! Good thing that's the only thing I ever collect!
 Also preserves original bytes count as u64 in result tuple for advanced printing logic.
 */
 fn get_prettybytes(bytes: u64) -> (u64, String) {
-	let clonedbytes = bytes.clone();
+	let clonedbytes = bytes;
 	let byteunit = Byte::from_u64(clonedbytes).get_appropriate_unit(UnitType::Binary);
 	let roundedstr = format!("{byteunit:.2}");
 	(clonedbytes, roundedstr)
@@ -23,10 +23,10 @@ Used for creating indexed placeholder strings
 Ex: placeholdertitle(1,"Disk") -> "Disk1"
 */
 fn placeholdertitle(index: u16, title: String) -> String {
-	let mut retstring = String::from(title);
+	let mut retstring = title;
 	let indexstr = index.to_string();
 	retstring.push_str(indexstr.as_str());
-	return retstring;
+	retstring
 }
 
 // Information about a disk from a single refresh interval
@@ -140,14 +140,14 @@ impl SystemBase {
 		self.diskinfos.clone()
 	}
 	// Function to refresh all the disk statistics
-	fn refresh_disks(&mut self) -> () {
+	fn refresh_disks(&mut self) {
 		self.disks.refresh(true);
 		// Update disk stats:
 		let mut ret_disks = Vec::new();
 		// NOTE: Can't zip disks with the usual "enumerate" here since usize isn't specific enough and I need a specific int size for enumeration
 		// NOTE: If your number of mounted disks can't fit in a u16, seek help (65535 mounted disks, not including network mounts, required to panic here)
 		let dlength: u16 = self.disks.list().len() as u16;
-		let dnums: Vec<u16> = (0..dlength).into_iter().collect();
+		let dnums: Vec<u16> = (0..dlength).collect();
 		let enumdisks = self.disks.list().iter().zip(dnums);
 		// i for current (u16) disk index as enumerated fallback printout for strings
 		for (disk, i) in enumdisks {
@@ -158,7 +158,7 @@ impl SystemBase {
 					// luks mapped disks can have excessive names that are just a full UUID
 					if n.contains("luks") {
 						String::from("luks disk")
-					} else if n == "" {
+					} else if n.is_empty() {
 						placeholdertitle(i, String::from("Disk "))
 					} else {
 						String::from(n)
@@ -179,9 +179,9 @@ impl SystemBase {
 				None => placeholdertitle(i, String::from("mount ")),
 			};
 			let dinfo = DiskInfo {
-				name: String::from(name),
-				fs: String::from(fs),
-				mnt: String::from(mnt),
+				name,
+				fs,
+				mnt,
 				total: get_prettybytes(disk.total_space()),
 				avail: get_prettybytes(disk.available_space()),
 				read: get_prettybytes(usage.read_bytes),
@@ -193,7 +193,7 @@ impl SystemBase {
 	}
 
 	// Function that handles refreshing network interface information
-	fn refresh_networks(&mut self) -> () {
+	fn refresh_networks(&mut self) {
 		// Network stats:
 		self.sys_networks.refresh(true);
 		let mut net_ifaces = Vec::new();
@@ -218,7 +218,7 @@ impl SystemBase {
 	}
 
 	// Function that handles refreshing components, for collecting thermal stats in celsius.
-	fn refresh_components(&mut self) -> () {
+	fn refresh_components(&mut self) {
 		// Components:
 		self.sys_components.refresh(true);
 		let mut temp_components = Vec::new();
@@ -231,7 +231,7 @@ impl SystemBase {
 	}
 
 	// Function for refreshing the RAM and SWAP stats
-	fn refresh_memory(&mut self) -> () {
+	fn refresh_memory(&mut self) {
 		self.sys.refresh_memory();
 		// Memory and Swap:
 		// for each value, return tuple of raw bytes count as u64 and a pretty string
@@ -242,7 +242,7 @@ impl SystemBase {
 	}
 
 	// Function for refreshing the CPU stats including individual cores
-	fn refresh_cpu(&mut self) -> () {
+	fn refresh_cpu(&mut self) {
 		self.sys.refresh_cpu_all();
 		// CPU:
 		self.cpu_avg = self.sys.global_cpu_usage();

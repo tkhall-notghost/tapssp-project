@@ -6,7 +6,6 @@ MIT License 2025
  */
 
 // clean exiting
-use ctrlc;
 use std::sync::atomic::{AtomicBool, Ordering};
 // refresh delay
 use std::{thread, time::Duration};
@@ -21,20 +20,18 @@ Print a subsections header line of standard length.
 Number of chars in title string MUST fit within u16.
 Number of chars in title SHOULD NOT exceed 66.
 */
-fn print_div(dtitle: String) -> () {
+fn print_div(dtitle: String) {
 	let charquota: u16 = 68;
 	let mut tlen = 0;
 	// get length as u16 instead of usize
-	for _ in dtitle.chars() {
-		tlen = tlen + 1;
-	}
+	for _ in dtitle.chars() {tlen += 1;}
 	let mut dashes = charquota - tlen;
 	print!("{}", dtitle.bold());
 	while dashes > 0 {
 		print!("-");
-		dashes = dashes - 1;
+		dashes -= 1;
 	}
-	println!("");
+		println!();
 }
 
 /*
@@ -43,7 +40,7 @@ Takes an f32 representing a percentage and prints it prettily inline.
 Ex: CPU core utilization
 Printed without a newline with a color from green to red indicating utilization level.
 */
-fn print_percent(usage: f32) -> () {
+fn print_percent(usage: f32) {
 	// TODO: write and use this, no println!, only print!
 	let round = usage.round();
 	let usgstr = round.to_string();
@@ -65,7 +62,7 @@ Takes two system-metric tuples from SystemBase and returns a pretty percentage p
 Junk values are permissible in the tuple string values.
 Arguments are only tuples for ease of use with SystemBase.
 */
-fn print_fraction((used, _): (u64, String), (avail, _): (u64, String)) -> () {
+fn print_fraction((used, _): (u64, String), (avail, _): (u64, String)) {
 	// get percentage of bytes used:
 	let usedf = used as f32;
 	let availf = avail as f32;
@@ -88,7 +85,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	print_div(String::from("CPU"));
 	print!("CPU avg: ");
 	print_percent(base.get_cpu_avg());
-	println!("");
+	println!();
 	println!("CPU Cores information:");
 	let mut brand = String::new();
 	let mut i: u32 = 1;
@@ -98,15 +95,13 @@ fn refresh_and_print(base: &mut SystemBase) {
 		print!("[ {} - ", c.name);
 		print_percent(c.usage);
 		print!(" ] ");
-		if ((i % 4) == 0) && (i != 1) {
-			println!("");
+		if (i.is_multiple_of(4)) && (i != 1) {
+			println!();
 		}
 		i += 1;
 	}
 	// there won't be a newline at the end in this case, so add one then:
-	if (i % 4) == 0 {
-		println!("");
-	}
+	if i.is_multiple_of(4) {println!();}
 	println!("  brand: {} - {} cores", brand, i);
 	print_div(String::from("RAM and Swap"));
 	let used = base.get_mem_used();
@@ -119,7 +114,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	);
 	print!("Approx. RAM Used: ");
 	print_fraction(used, avail);
-	println!("");
+	println!();
 	let cswap = base.get_swap_used();
 	print!("Swap Used: ");
 	// any swap usage should show as red
@@ -128,10 +123,10 @@ fn refresh_and_print(base: &mut SystemBase) {
 	} else {
 		print!("{}", cswap.1.green());
 	}
-	println!("");
+	println!();
 	// thermals are not supported on some machines/OSs (Windows!), so be prepared to drop them
 	let mut thermalstats = base.get_comp_temps().clone();
-	if thermalstats.len() != 0 {
+	if !thermalstats.is_empty() {
 		print_div(String::from("Thermal"));
 		thermalstats.sort_by(|a, b| b.0.cmp(&a.0));
 		for (component_string, celsius) in thermalstats {
@@ -154,9 +149,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 	ifaces.sort_by(|a, b| b.name.cmp(&a.name));
 	let mut firstiface = true;
 	for iface in ifaces {
-		if !firstiface {
-			println!("");
-		}
+		if !firstiface {println!();}
 		println!(" {} - {}", iface.name, iface.mac);
 		println!("  tx: {} - rx: {} ", iface.tx_bytes.1, iface.rx_bytes.1);
 		let mut networks = iface.networks.clone();
@@ -167,7 +160,7 @@ fn refresh_and_print(base: &mut SystemBase) {
 		firstiface = false;
 	}
 	// end of output
-	println!("");
+	println!();
 	println!("----- Ctrl-C to exit -----");
 	// run a refresh, update all SystemBase values to reflect current system stats
 	SystemBase::refresh(base);
@@ -190,7 +183,7 @@ fn main() -> Result<(), ctrlc::Error> {
 	})?;
 	// create a generic SystemBase which represents our gathered System information
 	let mut base = SystemBase::new();
-	while BEGIN_EXIT.load(Ordering::Relaxed) == false {
+	while !BEGIN_EXIT.load(Ordering::Relaxed) {
 		// refresh system info and print it
 		refresh_and_print(&mut base);
 		// system stats refresh delay
