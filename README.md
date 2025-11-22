@@ -5,6 +5,8 @@ Overtopr is a system monitor written in Rust by **Tessa Hall**.
 
 These screenshots were all collected during an active state, meaning I was running a CPU/GPU intensive process of some kind. Not at idle, to better demonstrate overtopr.
 
+![Video Demo](video-demo.mp4)
+
 - Linux
   - Arch Linux x86_64 Linux kernel: 6.12.58-1-lts
   - ![Linux Screenshot](linux.png)
