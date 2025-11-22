@@ -28,7 +28,7 @@ These screenshots were all collected during an active state, meaning I was runni
 ## compilation/usage
 
 - `cd overtop` (from root of this repository)
-- `cargo build`
+- `cargo build --release`
 - `cargo run` to test. Ctrl-C to quit for now.
 
 ## Feature roadmap
