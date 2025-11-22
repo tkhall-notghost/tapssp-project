@@ -27,9 +27,14 @@ These screenshots were all collected during an active state, meaning I was runni
 
 ## compilation/usage
 
-- `cd overtop` (from root of this repository)
-- `cargo build --release`
-- `cargo run` to test. Ctrl-C to quit for now.
+- `cd overtopr` (from root of this repository)
+- Then either:
+  - For a relase build:
+	- `cargo build --release`
+	- (execute) `./target/release` (or with backslashes on Windows)
+  - Or for testing:
+	- `cargo run`to test.
+- Then: Ctrl+C to exit
 
 ## Feature roadmap
 I've changed this a bit, aside from the core feature milestones, which have all already been met. Some extra optional features have been cut over time to prevent project scope creep and increased dependency compatibility issues across OSs.
